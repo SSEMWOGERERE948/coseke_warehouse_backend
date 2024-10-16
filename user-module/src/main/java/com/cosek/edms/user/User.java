@@ -1,5 +1,6 @@
 package com.cosek.edms.user;
 
+import com.cosek.edms.requests.Requests;
 import com.cosek.edms.casestudy.CaseStudy;
 import com.cosek.edms.departments.Department;
 import com.cosek.edms.files.Files;
@@ -42,6 +43,9 @@ public class User implements UserDetails {
     private String phone;
     private String address;
     private String password;
+
+    @OneToMany(mappedBy="user")
+    private List<Requests> requests;
 
     @CreatedDate
     @Column(name = "createdDate", nullable = true, updatable = false)
