@@ -45,6 +45,7 @@ public class User implements UserDetails {
     private String password;
 
     @OneToMany(mappedBy="user")
+    @JsonIgnore
     private List<Requests> requests;
 
     @CreatedDate
@@ -79,6 +80,7 @@ public class User implements UserDetails {
     private List<Files> files;
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
                 .flatMap(role -> role.getPermissions().stream())

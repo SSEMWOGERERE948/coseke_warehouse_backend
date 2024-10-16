@@ -19,8 +19,8 @@ public class RequestsController {
 
     // Create a new request
     @PostMapping
-    public ResponseEntity<Requests> createRequest(@RequestBody Files file) {
-        Requests createdRequest = requestsService.createRequest(file);
+    public ResponseEntity<Requests> createRequest(@RequestBody Requests requests) {
+        Requests createdRequest = requestsService.createRequest(requests);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
     }
 
@@ -36,6 +36,8 @@ public class RequestsController {
     @PatchMapping("/{requestId}/approve")
     public ResponseEntity<Requests> approveRequest(@PathVariable Long requestId) {
         Optional<Requests> approvedRequest = requestsService.approveRequest(requestId);
+        approvedRequest.get().getFiles().setStatus("Unavailable");
+        approvedRequest.get().setStage("Approved");
         return approvedRequest.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }

@@ -11,6 +11,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -19,12 +20,15 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Requests {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String stage;
+    private String state;
+    private LocalDateTime returnDate;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "files_id", referencedColumnName = "id", nullable = false)
@@ -47,7 +51,7 @@ public class Requests {
     private Long lastModifiedBy;
 
     @CreatedBy
-    @Column(name="createdBy", nullable = false, updatable = false)
+    @Column(name="createdBy", nullable = true, updatable = true)
     private Long createdBy;
 
 

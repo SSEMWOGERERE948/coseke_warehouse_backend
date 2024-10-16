@@ -1,6 +1,7 @@
 package com.cosek.edms.requests;
 
 import com.cosek.edms.files.Files;
+import com.cosek.edms.files.FilesRepository;
 import com.cosek.edms.user.User;
 import com.cosek.edms.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.Optional;
 public class RequestsService {
 
     private final RequestsRepository requestsRepository;
+    private final FilesRepository filesRepository;
     private final UserRepository userRepository; // Add this line to inject UserRepository
 
     // Get the currently logged-in user
@@ -28,12 +30,15 @@ public class RequestsService {
     }
 
     // Create a request
-    public Requests createRequest(Files files) {
+    public Requests createRequest(Requests requests) {
+        Files file = filesRepository.findById(requests.getFiles().getId()).orElseThrow();
         User loggedInUser = getLoggedInUser(); // Get the logged-in user
         Requests request = Requests.builder()
-                .files(files)
+                .files(file)
                 .user(loggedInUser) // Set the logged-in user as the user for this request
-                .stage("Officer") // Initial stage
+                .stage("Officer")
+                .returnDate(requests.getReturnDate())
+                .createdBy(requests.getCreatedBy())// Initial stage
                 .build();
         return requestsRepository.save(request);
     }
