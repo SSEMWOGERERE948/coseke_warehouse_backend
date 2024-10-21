@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -66,7 +67,27 @@ public class RequestsService {
     }
 
     // Approve the request (final stage)
+    @Transactional
     public Optional<Requests> approveRequest(Long requestId) {
-        return changeStage(requestId, "Approved");
+        Optional<Requests> requestOptional = requestsRepository.findById(requestId);
+        if (requestOptional.isPresent()) {
+            Requests request = requestOptional.get();
+            request.setStage("Approved");
+            request.setState("Complete");
+            request.getFiles().setStatus("Unavailable");
+            return Optional.of(requestsRepository.save(request));
+        }
+        return Optional.empty();
+    }
+    // Approve the request (final stage)
+    public Optional<Requests> rejectRequest(Long requestId) {
+        Optional<Requests> requestOptional = requestsRepository.findById(requestId);
+        if (requestOptional.isPresent()) {
+            Requests request = requestOptional.get();
+            request.setStage("Rejected");
+            request.setState("Complete");
+            return Optional.of(requestsRepository.save(request));
+        }
+        return Optional.empty();
     }
 }

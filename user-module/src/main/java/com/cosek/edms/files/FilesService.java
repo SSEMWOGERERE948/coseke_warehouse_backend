@@ -5,14 +5,18 @@ import com.cosek.edms.casestudy.CaseStudyRepository;
 import com.cosek.edms.exception.ResourceNotFoundException;
 import com.cosek.edms.folders.Folders;
 import com.cosek.edms.folders.FoldersRepository;
+import com.cosek.edms.requests.Requests;
+import com.cosek.edms.requests.RequestsRepository;
 import com.cosek.edms.user.User;
 import com.cosek.edms.user.UserRepository;
+import com.cosek.edms.user.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +28,7 @@ public class FilesService {
     private final UserRepository userRepository;
     private final CaseStudyRepository caseStudyRepository;
     private final FoldersRepository foldersRepository;
+    private final RequestsRepository requestsRepository;
 
 
     private User getLoggedInUser() {
@@ -113,5 +118,38 @@ public class FilesService {
 
         file.setFolder(folder);
         return filesRepository.save(file);
+    }
+
+
+    public String checkFileIn(Long fileId) throws AccessDeniedException {
+        // Fetch the file by its ID
+        Optional<Files> fileOptional = filesRepository.findById(fileId);
+        if (!fileOptional.isPresent()) {
+            throw new ResourceNotFoundException("File not found.");
+        }
+
+        Files file = fileOptional.get();
+
+        // Fetch the current logged-in user
+        User currentUser = getLoggedInUser();
+
+        // Find the request where the file is checked out by this user
+        Optional<Requests> requestOptional = requestsRepository.findByFilesAndUser(file, file.getResponsibleUser());
+        if (!requestOptional.isPresent()) {
+            throw new IllegalStateException("This file has not been checked out.");
+        }
+
+        Requests request = requestOptional.get();
+
+        // Check if the current user is the one who checked it out
+        if (!request.getUser().equals(currentUser)) {
+            throw new AccessDeniedException("Only the user who checked out the file can check it in.");
+        }
+
+        // Proceed with check-in logic (e.g., update the file status)
+        file.setStatus("Available");
+        filesRepository.save(file);
+
+        return "File checked in successfully.";
     }
 }
