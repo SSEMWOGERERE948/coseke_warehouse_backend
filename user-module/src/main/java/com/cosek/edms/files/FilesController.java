@@ -3,13 +3,16 @@ package com.cosek.edms.files;
 import com.cosek.edms.casestudy.CaseStudy;
 import com.cosek.edms.casestudy.CaseStudyRepository;
 import com.cosek.edms.casestudy.CaseStudyService;
+import com.cosek.edms.exception.ResourceNotFoundException;
 import com.cosek.edms.folders.Folders;
 import com.cosek.edms.folders.FoldersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +49,20 @@ public class FilesController {
     public ResponseEntity<List<Files>> getAllFiles() {
         List<Files> files = filesService.getAllFiles();
         return ResponseEntity.ok(files);
+    }
+
+    @PostMapping("/{fileId}/check-in")
+    public ResponseEntity<String> checkFileIn(@PathVariable Long fileId) {
+        try {
+            String message = filesService.checkFileIn(fileId);
+            return ResponseEntity.ok(message);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
     }
 
     @GetMapping("all/{id}")
