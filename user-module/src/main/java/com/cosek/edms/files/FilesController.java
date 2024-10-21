@@ -1,6 +1,12 @@
 package com.cosek.edms.files;
 
+import com.cosek.edms.casestudy.CaseStudy;
+import com.cosek.edms.casestudy.CaseStudyRepository;
+import com.cosek.edms.casestudy.CaseStudyService;
+import com.cosek.edms.folders.Folders;
+import com.cosek.edms.folders.FoldersService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,12 +21,19 @@ public class FilesController {
 
     private final FilesService filesService;
 
+    @Autowired
+    private CaseStudyService caseStudyService;
+
+    @Autowired
+    private final FoldersService foldersService;
+
+
+
     @PostMapping("/add")
     public ResponseEntity<Files> addFile(@RequestBody Files file) {
-        Files createdFile = filesService.addFile(file);
-        return ResponseEntity.ok(createdFile);
+        Files savedFile = filesService.addFile(file);
+        return ResponseEntity.ok(savedFile);
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<Files> getFileById(@PathVariable Long id) {
@@ -32,6 +45,12 @@ public class FilesController {
     @GetMapping("all")
     public ResponseEntity<List<Files>> getAllFiles() {
         List<Files> files = filesService.getAllFiles();
+        return ResponseEntity.ok(files);
+    }
+
+    @GetMapping("all/{id}")
+    public ResponseEntity<List<Files>> getAllFilesById(@PathVariable Long id) {
+        List<Files> files = filesService.getFilesByCreator(id);
         return ResponseEntity.ok(files);
     }
 

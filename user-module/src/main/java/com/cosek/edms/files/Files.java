@@ -24,32 +24,30 @@ import java.time.LocalDateTime;
 @Entity
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(ignoreUnknown = true) // Handles unknown fields
 public class Files {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String fileName;
-
     private String PIDInfant;
     private String PIDMother;
     private int boxNumber;
     private String status;
 
+
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @JsonIgnoreProperties({"files"})
+    @JsonIgnoreProperties({"files"}) // Prevents looping with User entity
     private User responsibleUser;
 
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "folder_id", referencedColumnName = "id")
-    @JsonIgnoreProperties({"files"})
+    @JsonIgnoreProperties({"files"}) // Prevents looping with Folders entity
     private Folders folder;
 
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "case_study_id", referencedColumnName = "id")
-    @JsonIgnoreProperties({"files"})
+    @JsonIgnoreProperties({"files"}) // Prevents looping with CaseStudy entity
     private CaseStudy caseStudy;
 
     @CreatedDate

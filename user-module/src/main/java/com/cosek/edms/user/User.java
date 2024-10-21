@@ -1,5 +1,6 @@
 package com.cosek.edms.user;
 
+import com.cosek.edms.requests.Requests;
 import com.cosek.edms.casestudy.CaseStudy;
 import com.cosek.edms.departments.Department;
 import com.cosek.edms.files.Files;
@@ -43,6 +44,10 @@ public class User implements UserDetails {
     private String address;
     private String password;
 
+    @OneToMany(mappedBy="user")
+    @JsonIgnore
+    private List<Requests> requests;
+
     @CreatedDate
     @Column(name = "createdDate", nullable = true, updatable = false)
     private LocalDateTime createdDate;
@@ -75,6 +80,7 @@ public class User implements UserDetails {
     private List<Files> files;
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
                 .flatMap(role -> role.getPermissions().stream())

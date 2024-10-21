@@ -7,6 +7,7 @@ import com.cosek.edms.folders.Folders;
 import com.cosek.edms.folders.FoldersRepository;
 import com.cosek.edms.user.User;
 import com.cosek.edms.user.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,17 +35,31 @@ public class FilesService {
     }
 
     public Files addFile(Files file) {
-        User loggedInUser = getLoggedInUser();
-        file.setResponsibleUser(loggedInUser);
+        if (file.getCaseStudy() != null && file.getCaseStudy().getId() != null) {
+            CaseStudy caseStudy = caseStudyRepository.findById(file.getCaseStudy().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("CaseStudy not found"));
+            file.setCaseStudy(caseStudy);
+        }
+
+        if (file.getFolder() != null && file.getFolder().getId() != null) {
+            Folders folder = foldersRepository.findById(file.getFolder().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Folder not found"));
+            file.setFolder(folder);
+        }
+
         return filesRepository.save(file);
     }
-
     public Optional<Files> getFileById(Long id) {
         return filesRepository.findById(id);
     }
 
     public List<Files> getAllFiles() {
         return filesRepository.findAll();
+    }
+
+    // Fetch files by the creator (for ADMIN and USER roles)
+    public List<Files> getFilesByCreator(Long id) {
+        return filesRepository.findByCreatedBy(id);
     }
 
     public Files updateFile(Long id, Files updatedFile) {

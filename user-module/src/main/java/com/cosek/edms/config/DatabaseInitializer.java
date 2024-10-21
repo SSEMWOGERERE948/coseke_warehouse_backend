@@ -80,7 +80,13 @@ public class DatabaseInitializer {
                 ensurePermission(READ_CASESTUDIES),
                 ensurePermission(CREATE_CASESTUDIES),
                 ensurePermission(UPDATE_CASESTUDIES),
-                ensurePermission(DELETE_CASESTUDIES)
+                ensurePermission(DELETE_CASESTUDIES),
+
+                // New Requests permissions
+                ensurePermission(READ_REQUESTS),
+                ensurePermission(CREATE_REQUESTS),
+                ensurePermission(UPDATE_REQUESTS),
+                ensurePermission(DELETE_REQUESTS)
         );
     }
 
@@ -100,7 +106,7 @@ public class DatabaseInitializer {
         Set<Permission> adminPermissions = permissions.stream()
                 .filter(permission -> List.of(
                         CREATE_USER, READ_USER, UPDATE_USER, DELETE_USER,
-                        CREATE_ROLE, READ_ROLE, UPDATE_ROLE, DELETE_ROLE
+                        CREATE_ROLE, READ_ROLE, UPDATE_ROLE, DELETE_ROLE,CREATE_FILES
                 ).contains(permission.getName()))
                 .collect(Collectors.toSet());
 

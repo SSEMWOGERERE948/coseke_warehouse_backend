@@ -1,11 +1,11 @@
 package com.cosek.edms.user;
 
 import com.cosek.edms.exception.NotFoundException;
-import com.cosek.edms.permission.Permission;
 import com.cosek.edms.permission.PermissionService;
 import com.cosek.edms.role.Role;
 import com.cosek.edms.role.RoleService;
 import com.cosek.edms.user.Models.CreateUserRequest;
+import com.cosek.edms.user.Models.UpdateUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -68,24 +68,15 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User updateUser(CreateUserRequest request, Long id) throws NotFoundException {
+    public User updateUser(UpdateUserRequest request, Long id) throws NotFoundException {
         User user = userRepository.findById(id).orElse(null);
-        List<Long> rolesFromRequest = request.getRoles();
-        Set<Role> roles = new HashSet<>();
 
-        for (Long roleId : rolesFromRequest) {
-            Role fetchedRole = roleService.findOneRole(roleId);
-            if (fetchedRole != null) {
-                roles.add(fetchedRole);
-            }
-        }
 
         assert user != null;
         user.setFirst_name(request.getFirst_name());
         user.setLast_name(request.getLast_name());
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
-        user.setRoles(roles);
         user.setAddress(request.getAddress());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         return userRepository.save(user);

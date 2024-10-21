@@ -10,4 +10,8 @@ import java.util.List;
 @Repository
 public interface CaseStudyRepository extends JpaRepository<CaseStudy, Long> {
     @Query(value = "SELECT user_id FROM case_study_user WHERE case_study_id = :caseStudyId", nativeQuery = true)
-    List<Long> findAssignedUserIdsByCaseStudyId(@Param("caseStudyId") Long caseStudyId);}
+    List<Long> findAssignedUserIdsByCaseStudyId(@Param("caseStudyId") Long caseStudyId);
+
+    @Query(value = "SELECT description,name FROM case_study WHERE id = :caseStudyId", nativeQuery = true)
+    CaseStudy findCaseStudyById(@Param("caseStudyId") Long caseStudyId);
+}

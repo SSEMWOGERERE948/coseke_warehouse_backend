@@ -3,6 +3,7 @@ package com.cosek.edms.user;
 import com.cosek.edms.exception.NotFoundException;
 import com.cosek.edms.role.Role;
 import com.cosek.edms.user.Models.CreateUserRequest;
+import com.cosek.edms.user.Models.UpdateUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,9 +54,9 @@ public class UserController {
     }
 
     @PutMapping("/users/update/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody CreateUserRequest user) {
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest update) {
         try {
-            return ResponseEntity.ok(userService.updateUser(user, id));
+            return ResponseEntity.ok(userService.updateUser(update, id));
         } catch (NotFoundException e) {
             throw new RuntimeException(e);
         }
