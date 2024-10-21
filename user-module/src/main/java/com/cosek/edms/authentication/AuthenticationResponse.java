@@ -14,6 +14,7 @@ import java.util.Set;
 @Data
 public class AuthenticationResponse {
     private String token;
+    private Long id;
     private String first_name;
     private String last_name;
     private String email;

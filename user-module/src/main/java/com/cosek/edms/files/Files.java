@@ -37,6 +37,7 @@ public class Files {
     private int boxNumber;
     private String status;
 
+
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonIgnoreProperties({"files"})

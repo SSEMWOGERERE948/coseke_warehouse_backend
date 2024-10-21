@@ -33,6 +33,10 @@ public class CaseStudyService {
         return caseStudyRepository.findById(id);
     }
 
+    public CaseStudy findCaseStudyById(Long caseStudyId) {
+        return caseStudyRepository.findCaseStudyById(caseStudyId);
+    }
+
     // Save a new case study
     public CaseStudy saveCaseStudy(CaseStudy caseStudy) {
         return caseStudyRepository.save(caseStudy);

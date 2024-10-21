@@ -45,6 +45,12 @@ public class Constants {
     public static final String UPDATE_CASESTUDIES = "UPDATE_CASESTUDIES";
     public static final String DELETE_CASESTUDIES = "DELETE_CASESTUDIES";
 
+    public static final String READ_REQUESTS = "READ_REQUESTS";
+    public static final String CREATE_REQUESTS = "CREATE_REQUESTS";
+    public static final String UPDATE_REQUESTS = "UPDATE_REQUESTS";
+    public static final String DELETE_REQUESTS = "DELETE_REQUESTS";
+
+
     // Other constants...
     public static final String USER_ROUTE = GENERAL_ROUTE + "/**";
     public static final String ROLE_ROUTE = GENERAL_ROUTE + "/roles/**";

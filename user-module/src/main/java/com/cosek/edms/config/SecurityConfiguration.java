@@ -76,7 +76,8 @@ public class SecurityConfiguration {
                                 // Files permissions
                                 .requestMatchers(HttpMethod.GET, "/api/v1/files/{id}").hasAuthority(READ_FILES)
                                 .requestMatchers(HttpMethod.GET, "/api/v1/files/all").hasAuthority(READ_FILES)
-                                .requestMatchers(HttpMethod.POST, "/api/v1/files/").hasAuthority(CREATE_FILES)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/files/all/{id}").hasAuthority(READ_FILES)
+                                .requestMatchers(HttpMethod.POST, "/api/v1/files/add").hasAuthority(CREATE_FILES)
                                 .requestMatchers(HttpMethod.PUT, "/api/v1/files/update/{id}").hasAuthority(UPDATE_FILES)
                                 .requestMatchers(HttpMethod.PUT, "/api/v1/files/update-multiple").hasAuthority(UPDATE_FILES)
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/files/delete/{id}").hasAuthority(DELETE_FILES)

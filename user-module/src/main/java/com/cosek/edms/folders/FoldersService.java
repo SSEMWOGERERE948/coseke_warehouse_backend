@@ -21,6 +21,11 @@ public class FoldersService {
         return foldersRepository.findById(id);
     }
 
+    public Folders findFolderById(Long folderId) {
+        return foldersRepository.findFolderById(folderId);
+    }
+
+
     public List<Folders> getAllFolders() {
         return foldersRepository.findAll();
     }
