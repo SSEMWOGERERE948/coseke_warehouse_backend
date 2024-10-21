@@ -47,6 +47,9 @@ public class FilesService {
             file.setFolder(folder);
         }
 
+        User loggedInUser = getLoggedInUser();
+        file.setResponsibleUser(loggedInUser);
+
         return filesRepository.save(file);
     }
     public Optional<Files> getFileById(Long id) {
