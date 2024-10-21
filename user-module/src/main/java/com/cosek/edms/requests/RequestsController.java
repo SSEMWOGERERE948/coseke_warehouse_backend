@@ -25,7 +25,7 @@ public class RequestsController {
     }
 
     // Change the stage of a request
-    @PatchMapping("/{requestId}/stage")
+    @PutMapping("/{requestId}/stage")
     public ResponseEntity<Requests> changeStage(@PathVariable Long requestId, @RequestParam String newStage) {
         Optional<Requests> updatedRequest = requestsService.changeStage(requestId, newStage);
         return updatedRequest.map(ResponseEntity::ok)
@@ -33,7 +33,7 @@ public class RequestsController {
     }
 
     // Approve a request
-    @PatchMapping("/{requestId}/approve")
+    @PutMapping("/{requestId}/approve")
     public ResponseEntity<Requests> approveRequest(@PathVariable Long requestId) {
         Optional<Requests> approvedRequest = requestsService.approveRequest(requestId);
         approvedRequest.get().getFiles().setStatus("Unavailable");

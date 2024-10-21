@@ -37,6 +37,7 @@ public class RequestsService {
                 .files(file)
                 .user(loggedInUser) // Set the logged-in user as the user for this request
                 .stage("Officer")
+                .state("In Progress")
                 .returnDate(requests.getReturnDate())
                 .createdBy(requests.getCreatedBy())// Initial stage
                 .build();
