@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -65,20 +66,41 @@ public class DepartmentService {
         departmentRepository.deleteById(id);
     }
 
-    public User assignUserDepartments(Long userId, List<String> departmentNames) throws NotFoundException {
+    public User assignUserDepartments(Long userId, List<Long> departmentIds) throws NotFoundException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         Set<Department> departments = user.getDepartments();
 
-        for (String departmentName : departmentNames) {
-            Department department = departmentRepository.findByDepartmentName(departmentName)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid department: " + departmentName));
+        for (Long departmentId : departmentIds) {
+            Department department = departmentRepository.findById(departmentId)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid department ID: " + departmentId));
 
             departments.add(department);
         }
 
         user.setDepartments(departments);
+        return userRepository.save(user);
+    }
+
+    public User unassignUserDepartments(Long userId, List<Long> departmentIds) throws NotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        Set<Department> currentDepartments = user.getDepartments();
+        Set<Department> departmentsToRemove = new HashSet<>();
+
+        for (Long departmentId : departmentIds) {
+            Department department = departmentRepository.findById(departmentId)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid department ID: " + departmentId));
+
+            departmentsToRemove.add(department);
+        }
+
+        // Remove the specified departments
+        currentDepartments.removeAll(departmentsToRemove);
+        user.setDepartments(currentDepartments);
+
         return userRepository.save(user);
     }
 

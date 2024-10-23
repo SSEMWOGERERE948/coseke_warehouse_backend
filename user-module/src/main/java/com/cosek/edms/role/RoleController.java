@@ -92,4 +92,26 @@ public class RoleController {
         }
     }
 
+
+    @PostMapping("/unassign-userType")
+    public ResponseEntity<?> unassignUserTypes(@RequestBody UserRoleRequest request) {
+        try {
+            Long userId = request.getUserId();
+            List<String> userTypes = request.getUserTypes();
+
+            if (userTypes == null || userTypes.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("User types list cannot be empty.");
+            }
+
+            // Unassign user types and return the updated user
+            User updatedUser = userService.unassignUserTypes(userId, userTypes);
+            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+    }
+
 }

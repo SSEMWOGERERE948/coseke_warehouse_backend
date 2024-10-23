@@ -86,7 +86,12 @@ public class DatabaseInitializer {
                 ensurePermission(READ_REQUESTS),
                 ensurePermission(CREATE_REQUESTS),
                 ensurePermission(UPDATE_REQUESTS),
-                ensurePermission(DELETE_REQUESTS)
+                ensurePermission(DELETE_REQUESTS),
+
+                ensurePermission(READ_DEPARTMENTS),
+                ensurePermission(CREATE_DEPARTMENTS),
+                ensurePermission(UPDATE_DEPARTMENTS),
+                ensurePermission(DELETE_DEPARTMENTS)
         );
     }
 

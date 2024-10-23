@@ -50,6 +50,10 @@ public class Constants {
     public static final String UPDATE_REQUESTS = "UPDATE_REQUESTS";
     public static final String DELETE_REQUESTS = "DELETE_REQUESTS";
 
+    public static final String READ_DEPARTMENTS = "READ_DEPARTMENTS";
+    public static final String CREATE_DEPARTMENTS = "CREATE_DEPARTMENTS";
+    public static final String UPDATE_DEPARTMENTS = "UPDATE_DEPARTMENTS";
+    public static final String DELETE_DEPARTMENTS = "DELETE_DEPARTMENTS";
 
     // Other constants...
     public static final String USER_ROUTE = GENERAL_ROUTE + "/**";

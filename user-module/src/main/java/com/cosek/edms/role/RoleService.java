@@ -166,6 +166,17 @@ public class RoleService {
         Permission readUser = permissionRepository.findByName("READ_USER")
                 .orElseGet(() -> permissionRepository.save(new Permission(null, "READ_USER", new HashSet<>())));
 
+
+        // Existing User and Role Permissions
+        Permission createDepartment = permissionRepository.findByName("CREATE_DEPARTMENT")
+                .orElseGet(() -> permissionRepository.save(new Permission(null, "CREATE_DEPARTMENT", new HashSet<>())));
+        Permission deleteDepartment = permissionRepository.findByName("DELETE_DEPARTMENT")
+                .orElseGet(() -> permissionRepository.save(new Permission(null, "DELETE_DEPARTMENT", new HashSet<>())));
+        Permission readDepartment = permissionRepository.findByName("READ_DEPARTMENT")
+                .orElseGet(() -> permissionRepository.save(new Permission(null, "READ_DEPARTMENT", new HashSet<>())));
+        Permission updateDepartment = permissionRepository.findByName("UPDATE_DEPARTMENT")
+                .orElseGet(() -> permissionRepository.save(new Permission(null, "UPDATE_DEPARTMENT", new HashSet<>())));
+
         // Assign permissions to roles
         Role adminRole = roleRepository.findByName("ADMIN")
                 .orElseGet(() -> {
@@ -175,7 +186,7 @@ public class RoleService {
                             readUser,
                             readFiles, createFiles, updateFiles, deleteFiles,
                             readFolders, createFolders, updateFolders, deleteFolders,
-                            readCaseStudies, createCaseStudies, updateCaseStudies, deleteCaseStudies
+                            readCaseStudies, createCaseStudies, updateCaseStudies, deleteCaseStudies,readDepartment
                     )));
                     return role;
                 });

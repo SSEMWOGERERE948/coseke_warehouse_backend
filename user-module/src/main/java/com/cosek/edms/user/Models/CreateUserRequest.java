@@ -15,4 +15,5 @@ public class CreateUserRequest {
     private String password;
     private List<Long> roles;
     private String userType;
+    private List<Long> departments;
 }

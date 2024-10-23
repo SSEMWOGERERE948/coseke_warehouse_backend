@@ -68,6 +68,35 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User unassignUserTypes(Long userId, List<String> userTypes) throws NotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        Set<Role> currentRoles = user.getRoles();
+        Set<Role> rolesToRemove = new HashSet<>();
+
+        for (String userType : userTypes) {
+            Role roleToRemove;
+            if ("admin".equalsIgnoreCase(userType)) {
+                roleToRemove = roleService.findByRoleName("ADMIN");
+            } else if ("user".equalsIgnoreCase(userType)) {
+                roleToRemove = roleService.findByRoleName("USER");
+            } else {
+                throw new IllegalArgumentException("Invalid user type: " + userType);
+            }
+
+            if (roleToRemove != null) {
+                rolesToRemove.add(roleToRemove);
+            }
+        }
+
+        // Remove the specified roles
+        currentRoles.removeAll(rolesToRemove);
+        user.setRoles(currentRoles);
+
+        return userRepository.save(user);
+    }
+
     public User updateUser(UpdateUserRequest request, Long id) throws NotFoundException {
         User user = userRepository.findById(id).orElse(null);
 

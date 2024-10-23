@@ -54,6 +54,11 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.PUT, "/api/v1/users/{userID}/roles/{roleID}","/api/v1/users/update/{id}","/api/v1/users/roles-update/{id}").hasAuthority(UPDATE_USER)
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/users/{id}").hasAuthority(DELETE_USER)
 
+
+                                .requestMatchers(HttpMethod.POST, "/api/v1/departments/create-department").hasAuthority(CREATE_DEPARTMENTS)
+                                .requestMatchers(HttpMethod.POST, "/api/v1/departments/assign-user-to-department").hasAuthority(UPDATE_DEPARTMENTS)
+
+
                                 // Role permissions
                                 .requestMatchers(HttpMethod.GET, "/api/v1/roles/all").hasAuthority(READ_ROLE)
                                 .requestMatchers(HttpMethod.POST, "/api/v1/roles/create-roles").hasAuthority(CREATE_ROLE)

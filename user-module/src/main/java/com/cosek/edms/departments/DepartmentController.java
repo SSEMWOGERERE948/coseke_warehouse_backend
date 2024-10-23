@@ -68,15 +68,15 @@ public class DepartmentController {
     @PostMapping("/assign-user-to-department")
     public ResponseEntity<?> assignDepartmentToUser(@RequestBody DepartmentUserAssign request) {
         try {
-            Long userId = request.getId();
-            List<String> departmentNames = request.getDepartmentName();
+            Long userId = request.getUserId();
+            List<Long> departmentIds = request.getDepartmentIds();
 
-            if (departmentNames == null || departmentNames.isEmpty()) {
+            if (departmentIds == null || departmentIds.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Department list cannot be empty.");
             }
 
             // Assign multiple departments to the user
-            User updatedUser = departmentService.assignUserDepartments(userId, departmentNames);
+            User updatedUser = departmentService.assignUserDepartments(userId, departmentIds);
             return new ResponseEntity<>(updatedUser, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -84,5 +84,26 @@ public class DepartmentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
     }
+
+    @PostMapping("/unassign-user-from-department")
+    public ResponseEntity<?> unassignUserFromDepartment(@RequestBody DepartmentUserAssign request) {
+        try {
+            Long userId = request.getUserId();
+            List<Long> departmentIds = request.getDepartmentIds();
+
+            if (departmentIds == null || departmentIds.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Department list cannot be empty.");
+            }
+
+            // Unassign departments from the user
+            User updatedUser = departmentService.unassignUserDepartments(userId, departmentIds);
+            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+    }
+
 
 }
