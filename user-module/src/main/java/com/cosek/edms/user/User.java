@@ -147,4 +147,10 @@ public class User implements UserDetails {
                 ", address='" + address + '\'' +
                 '}';
     }
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_departments",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "department_id"))
+    private Set<Department> departments = new HashSet<>();
 }

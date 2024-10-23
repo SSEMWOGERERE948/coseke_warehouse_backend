@@ -1,16 +1,21 @@
 package com.cosek.edms.departments;
 
 import com.cosek.edms.exception.NotFoundException;
+import com.cosek.edms.user.User;
+import com.cosek.edms.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class DepartmentService {
     private final DepartmentRepository departmentRepository;
+    private final UserRepository userRepository;
+
 
     @Transactional
     public Department createDepartment(Department department) {
@@ -59,4 +64,22 @@ public class DepartmentService {
         }
         departmentRepository.deleteById(id);
     }
+
+    public User assignUserDepartments(Long userId, List<String> departmentNames) throws NotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        Set<Department> departments = user.getDepartments();
+
+        for (String departmentName : departmentNames) {
+            Department department = departmentRepository.findByDepartmentName(departmentName)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid department: " + departmentName));
+
+            departments.add(department);
+        }
+
+        user.setDepartments(departments);
+        return userRepository.save(user);
+    }
+
 }

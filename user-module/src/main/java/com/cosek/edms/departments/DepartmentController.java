@@ -1,8 +1,12 @@
 package com.cosek.edms.departments;
 
+import com.cosek.edms.departments.DepartmentModule.DepartmentUserAssign;
 import com.cosek.edms.exception.NotFoundException;
+import com.cosek.edms.user.User;
+import com.cosek.edms.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +23,8 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class DepartmentController {
     private final DepartmentService departmentService;
+    private final UserService userService;
+
 
     @PostMapping("/create-department")
     public ResponseEntity<Department> createDepartment(@RequestBody Department department) {
@@ -58,4 +64,25 @@ public class DepartmentController {
         departmentService.deleteDepartment(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/assign-user-to-department")
+    public ResponseEntity<?> assignDepartmentToUser(@RequestBody DepartmentUserAssign request) {
+        try {
+            Long userId = request.getId();
+            List<String> departmentNames = request.getDepartmentName();
+
+            if (departmentNames == null || departmentNames.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Department list cannot be empty.");
+            }
+
+            // Assign multiple departments to the user
+            User updatedUser = departmentService.assignUserDepartments(userId, departmentNames);
+            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+    }
+
 }
