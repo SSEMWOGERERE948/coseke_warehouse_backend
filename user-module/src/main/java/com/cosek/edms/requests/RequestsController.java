@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,14 +35,35 @@ public class RequestsController {
 
     // Approve a request
     @PutMapping("/{requestId}/approve")
-    public ResponseEntity<Requests> approveRequest(@PathVariable Long requestId) {
-        Optional<Requests> approvedRequest = requestsService.approveRequest(requestId);
-        approvedRequest.get().getFiles().setStatus("Unavailable");
-        approvedRequest.get().setStage("Approved");
-        return approvedRequest.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
+    public ResponseEntity<?> approveRequest(@PathVariable Long requestId) {
+        try {
+            Optional<Requests> approvedRequest = requestsService.approveRequest(requestId);
 
+            if (approvedRequest.isPresent()) {
+                approvedRequest.get().getFiles().setStatus("Unavailable");
+                approvedRequest.get().setStage("Approved");
+                return ResponseEntity.ok(approvedRequest.get());
+            } else {
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body("Request with ID " + requestId + " not found");
+            }
+
+        } catch (AccessDeniedException e) {
+            // Get the actual error message from the exception
+            String errorMessage = e.getMessage() != null ? e.getMessage() : "Access denied: You don't have permission to approve this request";
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(errorMessage);
+
+        } catch (Exception e) {
+            // Get the actual error message from the exception
+            String errorMessage = e.getMessage() != null ? e.getMessage() : "An unexpected error occurred";
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(errorMessage);
+        }
+    }
     // Reject a request
     @PutMapping("/{requestId}/reject")
     public ResponseEntity<Requests> rejectRequest(@PathVariable Long requestId, @RequestParam String reason) {

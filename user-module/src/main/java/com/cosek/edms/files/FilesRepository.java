@@ -8,5 +8,4 @@ import java.util.List;
 @Repository
 public interface FilesRepository extends JpaRepository<Files, Long> {
     List<Files> findByCreatedBy(Long createdBy);
-
 }

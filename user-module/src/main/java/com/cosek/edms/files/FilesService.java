@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -123,30 +125,42 @@ public class FilesService {
 
     public String checkFileIn(Long fileId) throws AccessDeniedException {
         // Fetch the file by its ID
-        Optional<Files> fileOptional = filesRepository.findById(fileId);
-        if (!fileOptional.isPresent()) {
-            throw new ResourceNotFoundException("File not found.");
-        }
-
-        Files file = fileOptional.get();
+        Files file = filesRepository.findById(fileId)
+                .orElseThrow(() -> new ResourceNotFoundException("File not found."));
 
         // Fetch the current logged-in user
         User currentUser = getLoggedInUser();
 
-        // Find the request where the file is checked out by this user
-        Optional<Requests> requestOptional = requestsRepository.findByFilesAndUser(file, file.getResponsibleUser());
-        if (!requestOptional.isPresent()) {
+        // Find all requests for this file
+        List<Requests> requests = requestsRepository.findByFilesAndUser(file, file.getResponsibleUser());
+
+        // Find active checkout requests (not returned)
+        List<Requests> activeRequests = requests.stream()
+                .filter(r -> Objects.equals(r.getFiles().getId(), fileId) &&
+                        !Objects.equals(r.getStage(), "Returned") &&
+                        Objects.equals(r.getStage(), "Approved"))
+                .toList();
+
+        // Check if file is actually checked out
+        if (activeRequests.isEmpty()) {
             throw new IllegalStateException("This file has not been checked out.");
         }
 
-        Requests request = requestOptional.get();
+        // Verify the current user is the one who checked it out
+        boolean isCheckedOutByCurrentUser = activeRequests.stream()
+                .anyMatch(r -> r.getUser().equals(currentUser));
 
-        // Check if the current user is the one who checked it out
-        if (!request.getUser().equals(currentUser)) {
+        if (!isCheckedOutByCurrentUser) {
             throw new AccessDeniedException("Only the user who checked out the file can check it in.");
         }
 
-        // Proceed with check-in logic (e.g., update the file status)
+        // Update all active requests to Returned status
+        activeRequests.forEach(request -> {
+            request.setStage("Returned");
+            requestsRepository.save(request);
+        });
+
+        // Update file status
         file.setStatus("Available");
         filesRepository.save(file);
 

@@ -10,7 +10,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -68,9 +70,12 @@ public class RequestsService {
 
     // Approve the request (final stage)
     @Transactional
-    public Optional<Requests> approveRequest(Long requestId) {
+    public Optional<Requests> approveRequest(Long requestId) throws AccessDeniedException {
         Optional<Requests> requestOptional = requestsRepository.findById(requestId);
         if (requestOptional.isPresent()) {
+            if(Objects.equals(requestOptional.get().getFiles().getStatus(), "Unavailable")) {
+                throw new AccessDeniedException("Cannot checkout file because it is currently unavailable!");
+            }
             Requests request = requestOptional.get();
             request.setStage("Approved");
             request.setState("Complete");
