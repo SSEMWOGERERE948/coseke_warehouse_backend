@@ -29,6 +29,7 @@ public class Requests {
     private String stage;
     private String state;
     private LocalDateTime returnDate;
+    private String reason;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "files_id", referencedColumnName = "id", nullable = false)

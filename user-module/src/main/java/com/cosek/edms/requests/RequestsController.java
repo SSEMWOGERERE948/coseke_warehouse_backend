@@ -44,8 +44,8 @@ public class RequestsController {
 
     // Reject a request
     @PutMapping("/{requestId}/reject")
-    public ResponseEntity<Requests> rejectRequest(@PathVariable Long requestId) {
-        Optional<Requests> approvedRequest = requestsService.rejectRequest(requestId);
+    public ResponseEntity<Requests> rejectRequest(@PathVariable Long requestId, @RequestParam String reason) {
+        Optional<Requests> approvedRequest = requestsService.rejectRequest(requestId, reason);
         approvedRequest.get().setStage("Rejected");
         return approvedRequest.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());

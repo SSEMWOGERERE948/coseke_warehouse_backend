@@ -80,12 +80,13 @@ public class RequestsService {
         return Optional.empty();
     }
     // Approve the request (final stage)
-    public Optional<Requests> rejectRequest(Long requestId) {
+    public Optional<Requests> rejectRequest(Long requestId, String reason) {
         Optional<Requests> requestOptional = requestsRepository.findById(requestId);
         if (requestOptional.isPresent()) {
             Requests request = requestOptional.get();
             request.setStage("Rejected");
             request.setState("Complete");
+            request.setReason(reason);
             return Optional.of(requestsRepository.save(request));
         }
         return Optional.empty();
