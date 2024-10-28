@@ -29,8 +29,7 @@ public class Files {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String PIDInfant;
-    private String PIDMother;
+    private String PID;
     private int boxNumber;
     private String status;
 
