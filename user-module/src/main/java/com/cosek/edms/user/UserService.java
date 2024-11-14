@@ -1,5 +1,7 @@
 package com.cosek.edms.user;
 
+import com.cosek.edms.MailingService.MailingDetails;
+import com.cosek.edms.MailingService.MailingServiceService;
 import com.cosek.edms.exception.NotFoundException;
 import com.cosek.edms.permission.PermissionService;
 import com.cosek.edms.role.Role;
@@ -25,7 +27,7 @@ public class UserService {
     private final RoleService roleService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final PermissionService permissionService;
-    private final JavaMailSender mailSender;
+    private final MailingServiceService mailingService;
 
     private final Map<String, PasswordResetToken> resetTokens = new HashMap<>(); // To store tokens temporarily
 
@@ -54,15 +56,12 @@ public class UserService {
         // Generate a unique token
         String token = UUID.randomUUID().toString();
         resetTokens.put(token, new PasswordResetToken(user, token, new Date(System.currentTimeMillis() + 15 * 60 * 1000))); // 15 min expiry
-
-        // Send email with reset link (adjust the URL as needed)
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(user.getEmail());
-        message.setSubject("Password Reset Request");
-        message.setText("To reset your password, click the link below:\n" +
-                "http://y/reset-password?token=" + token);
-        mailSender.send(message);
-
+        MailingDetails mailingDetails = MailingDetails.builder()
+                .recipient(new String[]{user.getEmail()})
+                .subject("Password Reset Request")
+                        .msgBody("To reset your password, click the link below:\n" +
+                                "http://10.1.0.115/reset-password?token=" + token).build();
+        mailingService.sendMail(mailingDetails, "rams@baylor-uganda.org");
         return "Password reset email sent";
     }
 

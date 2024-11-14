@@ -56,7 +56,7 @@ public class RequestsService {
                                 "Requested Return Date: %s%n%n" +
                                 "Your request is currently being reviewed at the 'Officer' stage and is marked as 'In Progress'.%n%n" +
                                 "You can check the status of your request at any time using the following link:%n" +
-                                "https://example.com/request-status%n%n" +
+                                "http://10.1.0.115/dashboard/tasks/my-requests%n%n" +
                                 "Thank you,%n" +
                                 "Records Management Team",
                         loggedInUser.getFirst_name() + " " + loggedInUser.getLast_name(),
@@ -91,7 +91,7 @@ public class RequestsService {
                             "Dear %s,%n%n" +
                                     "Your request has been moved to the '%s' stage.%n%n" +
                                     "You can check the status of your request using the following link:%n" +
-                                    "https://example.com/request-status%n%n" +
+                                    "http://10.1.0.115/dashboard/tasks/my-requests%n%n" +
                                     "Thank you,%n" +
                                     "Records Management Team",
                             requestUser.getFirst_name() + " " + requestUser.getLast_name(),
@@ -125,7 +125,7 @@ public class RequestsService {
                             "Dear %s,%n%n" +
                                     "Your request has been approved and is now complete.%n%n" +
                                     "You can view details at:%n" +
-                                    "https://example.com/request-status%n%n" +
+                                    "http://10.1.0.115/dashboard/tasks/my-requests%n%n" +
                                     "Thank you,%n" +
                                     "Records Management Team",
                             requestUser.getFirst_name() + " " + requestUser.getLast_name()
@@ -152,12 +152,13 @@ public class RequestsService {
                     .subject("Request Rejected")
                     .msgBody(String.format(
                             "Dear %s,%n%n" +
-                                    "Your request has been rejected for the following reason:%n" +
+                                    "Your request has for file with PID %s, been rejected for the following reason:%n" +
                                     "%s%n%n" +
                                     "If you have any questions, please contact support.%n%n" +
                                     "Thank you,%n" +
                                     "Records Management Team",
                             requestUser.getFirst_name() + " " + requestUser.getLast_name(),
+                            request.getFiles().getPID(),
                             reason
                     ))
                     .build();
