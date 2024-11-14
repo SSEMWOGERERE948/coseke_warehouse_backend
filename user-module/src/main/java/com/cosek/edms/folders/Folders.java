@@ -1,6 +1,8 @@
 package com.cosek.edms.folders;
 
 import com.cosek.edms.files.Files;
+import com.cosek.edms.user.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -47,4 +49,11 @@ public class Folders {
     @CreatedBy
     @Column(name="createdBy", nullable = false, updatable = false)
     private Long createdBy;
+
+    @ManyToOne
+    @JoinColumn(name = "responsible_user_id", nullable = true)
+    @JsonIgnore  // Add this to prevent user serialization
+    private User responsibleUser;
+
+
 }

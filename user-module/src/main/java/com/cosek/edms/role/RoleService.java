@@ -196,7 +196,7 @@ public class RoleService {
                     Role role = new Role();
                     role.setName("USER");
                     role.setPermissions(new HashSet<>(Arrays.asList(
-                            readFiles, readFolders, readCaseStudies,createFiles
+                            readFiles, readFolders, readCaseStudies,createFiles,readDepartment
                     )));
                     return role;
                 });

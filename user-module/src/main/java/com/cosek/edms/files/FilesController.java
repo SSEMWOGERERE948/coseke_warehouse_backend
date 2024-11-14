@@ -45,7 +45,7 @@ public class FilesController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("all")
+    @GetMapping("/all")
     public ResponseEntity<List<Files>> getAllFiles() {
         List<Files> files = filesService.getAllFiles();
         return ResponseEntity.ok(files);
@@ -112,4 +112,11 @@ public class FilesController {
         Files updatedFile = filesService.assignFileToFolder(fileId, folderId);
         return ResponseEntity.ok(updatedFile);
     }
+
+    @GetMapping("/by-departments/{userId}")
+    public ResponseEntity<List<Files>> getFilesByDepartments(@PathVariable Long userId) {
+        List<Files> files = filesService.getFilesByDepartments(userId);
+        return ResponseEntity.ok(files);
+    }
+
 }

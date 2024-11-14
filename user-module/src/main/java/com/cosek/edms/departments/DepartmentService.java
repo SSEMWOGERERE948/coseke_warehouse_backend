@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -102,6 +103,16 @@ public class DepartmentService {
         user.setDepartments(currentDepartments);
 
         return userRepository.save(user);
+    }
+
+    public List<Long> getDepartmentsByUserId(Long userId) throws NotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        // Assuming user has a collection of departments
+        return user.getDepartments().stream()
+                .map(Department::getId)
+                .collect(Collectors.toList());
     }
 
 }

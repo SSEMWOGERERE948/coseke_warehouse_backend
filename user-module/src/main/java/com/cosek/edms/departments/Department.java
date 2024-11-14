@@ -1,5 +1,6 @@
 package com.cosek.edms.departments;
 
+import com.cosek.edms.folders.Folders;
 import com.cosek.edms.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -12,6 +13,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -54,5 +56,15 @@ public class Department {
     public Long getDepartmentId(){
         return id;
     }
+
+
+    // Assuming a Many-to-Many relationship between Department and Folders
+    @ManyToMany
+    @JoinTable(
+            name = "department_folders",
+            joinColumns = @JoinColumn(name = "department_id"),
+            inverseJoinColumns = @JoinColumn(name = "folder_id")
+    )
+    private List<Folders> folders;
 
 }

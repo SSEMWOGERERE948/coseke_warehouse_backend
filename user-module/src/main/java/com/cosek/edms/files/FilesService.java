@@ -2,6 +2,7 @@ package com.cosek.edms.files;
 
 import com.cosek.edms.casestudy.CaseStudy;
 import com.cosek.edms.casestudy.CaseStudyRepository;
+import com.cosek.edms.departments.Department;
 import com.cosek.edms.exception.ResourceNotFoundException;
 import com.cosek.edms.folders.Folders;
 import com.cosek.edms.folders.FoldersRepository;
@@ -165,4 +166,21 @@ public class FilesService {
 
         return "File checked in successfully.";
     }
+
+    public List<Files> getFilesByDepartments(Long userId) {
+        // Fetch user's department IDs
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (user.getDepartments() == null || user.getDepartments().isEmpty()) {
+            return List.of(); // Return empty if no departments assigned
+        }
+
+        List<Long> departmentIds = user.getDepartments().stream()
+                .map(Department::getId)
+                .collect(Collectors.toList());
+
+        return filesRepository.findFilesByDepartmentIds(departmentIds);
+    }
+
 }

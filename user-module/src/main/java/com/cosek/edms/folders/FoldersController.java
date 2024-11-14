@@ -1,5 +1,7 @@
 package com.cosek.edms.folders;
 
+import com.cosek.edms.exception.ResourceNotFoundException;
+import com.cosek.edms.folders.Models.AssignFolderToDepartment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -57,4 +59,41 @@ public class FoldersController {
         foldersService.deleteMultipleFolders(ids);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/manage-assignment")
+    public ResponseEntity<String> manageFolderAssignment(@RequestBody AssignFolderToDepartment request) {
+        try {
+            if ("ASSIGN".equals(request.getOperation())) {
+                foldersService.assignFoldersToDepartment(request.getDepartmentId(), request.getFolderIds());
+                return ResponseEntity.ok("Folders assigned successfully.");
+            } else if ("UNASSIGN".equals(request.getOperation())) {
+                foldersService.unassignFoldersFromDepartment(request.getDepartmentId(), request.getFolderIds());
+                return ResponseEntity.ok("Folders unassigned successfully.");
+            } else {
+                return ResponseEntity.badRequest().body("Invalid operation specified.");
+            }
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body("An error occurred while managing folder assignment: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/departments/{departmentId}")
+    public ResponseEntity<List<Folders>> getAssignedFolders(@PathVariable Long departmentId) {
+        try {
+            List<Folders> assignedFolders = foldersService.getAssignedFolders(departmentId);
+            return ResponseEntity.ok(assignedFolders);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/all/{userId}")
+    public ResponseEntity<List<Folders>> getFoldersByUserDepartments(@PathVariable Long userId) {
+        List<Folders> folders = foldersService.getfoldersByUserId(userId);
+        return ResponseEntity.ok(folders);
+    }
 }
+

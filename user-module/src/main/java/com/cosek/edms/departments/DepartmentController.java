@@ -47,7 +47,7 @@ public class DepartmentController {
         return ResponseEntity.ok(departmentService.getDepartmentByName(departmentName));
     }
 
-    @GetMapping("/")
+    @GetMapping("/all")
     public ResponseEntity<List<Department>> getAllDepartments() {
         return ResponseEntity.ok(departmentService.getAllDepartments());
     }
@@ -105,5 +105,13 @@ public class DepartmentController {
         }
     }
 
-
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Long>> getDepartmentsByUserId(@PathVariable Long userId) {
+        try {
+            List<Long> departmentIds = departmentService.getDepartmentsByUserId(userId);
+            return ResponseEntity.ok(departmentIds);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
 }
