@@ -180,7 +180,7 @@ public class FilesService {
                 .map(Department::getId)
                 .collect(Collectors.toList());
 
-        return filesRepository.findFilesByDepartmentIds(departmentIds);
+        return filesRepository.findFilesByDepartmentIdsAndFolders(departmentIds);
     }
 
 }

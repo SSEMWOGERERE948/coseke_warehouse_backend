@@ -105,11 +105,14 @@ public class UserService {
 
         for (String userType : userTypes) {
             Role assignedRole;
-            if ("admin".equalsIgnoreCase(userType)) {
-                assignedRole = roleService.findByRoleName("ADMIN");
+            if ("manager".equalsIgnoreCase(userType)) {
+                assignedRole = roleService.findByRoleName("MANAGER");
             } else if ("user".equalsIgnoreCase(userType)) {
                 assignedRole = roleService.findByRoleName("USER");
-            } else {
+            } else if ("supervisor".equalsIgnoreCase(userType)) {
+                assignedRole = roleService.findByRoleName("SUPERVISOR");
+            }
+            else {
                 throw new IllegalArgumentException("Invalid user type: " + userType);
             }
 
@@ -129,11 +132,14 @@ public class UserService {
 
         for (String userType : userTypes) {
             Role roleToRemove;
-            if ("admin".equalsIgnoreCase(userType)) {
-                roleToRemove = roleService.findByRoleName("ADMIN");
+            if ("manager".equalsIgnoreCase(userType)) {
+                roleToRemove = roleService.findByRoleName("MANAGER");
             } else if ("user".equalsIgnoreCase(userType)) {
                 roleToRemove = roleService.findByRoleName("USER");
-            } else {
+            }
+            else if ("supervisor".equalsIgnoreCase(userType)) {
+                roleToRemove = roleService.findByRoleName("SUPERVISOR");
+            }else {
                 throw new IllegalArgumentException("Invalid user type: " + userType);
             }
 

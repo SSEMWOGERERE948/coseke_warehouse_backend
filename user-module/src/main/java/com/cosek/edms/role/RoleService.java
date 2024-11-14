@@ -178,10 +178,10 @@ public class RoleService {
                 .orElseGet(() -> permissionRepository.save(new Permission(null, "UPDATE_DEPARTMENT", new HashSet<>())));
 
         // Assign permissions to roles
-        Role adminRole = roleRepository.findByName("ADMIN")
+        Role adminRole = roleRepository.findByName("MANAGER")
                 .orElseGet(() -> {
                     Role role = new Role();
-                    role.setName("ADMIN");
+                    role.setName("MANAGER");
                     role.setPermissions(new HashSet<>(Arrays.asList(
                             readUser,
                             readFiles, createFiles, updateFiles, deleteFiles,
@@ -201,9 +201,25 @@ public class RoleService {
                     return role;
                 });
 
+        Role supervisorRole = roleRepository.findByName("SUPERVISOR")
+                .orElseGet(() -> {
+                    Role role = new Role();
+                    role.setName("SUPERVISOR");
+                    role.setPermissions(new HashSet<>(Arrays.asList(
+                            readUser,
+                            readFiles, createFiles, updateFiles, deleteFiles,
+                            readFolders, createFolders, updateFolders, deleteFolders,
+                            readCaseStudies, createCaseStudies, updateCaseStudies, deleteCaseStudies,readDepartment
+                    )));
+                    return role;
+                });
+
+
         // Save roles
         roleRepository.save(adminRole);
         roleRepository.save(userRole);
+        roleRepository.save(supervisorRole);
+
     }
 
     public Role addPermissionToRole(String roleName, String permissionName) {

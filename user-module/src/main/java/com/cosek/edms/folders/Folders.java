@@ -1,5 +1,6 @@
 package com.cosek.edms.folders;
 
+import com.cosek.edms.departments.Department;
 import com.cosek.edms.files.Files;
 import com.cosek.edms.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,6 +18,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Table
@@ -55,6 +57,10 @@ public class Folders {
     @JoinColumn(name = "responsible_user_id", nullable = true)
     @JsonIgnore  // Add this to prevent user serialization
     private User responsibleUser;
+
+    @ManyToMany(mappedBy = "folders")
+    @JsonIgnore
+    private Set<Department> departments;
 
 
 }

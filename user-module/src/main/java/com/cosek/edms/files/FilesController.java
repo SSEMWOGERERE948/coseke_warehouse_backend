@@ -118,5 +118,4 @@ public class FilesController {
         List<Files> files = filesService.getFilesByDepartments(userId);
         return ResponseEntity.ok(files);
     }
-
 }

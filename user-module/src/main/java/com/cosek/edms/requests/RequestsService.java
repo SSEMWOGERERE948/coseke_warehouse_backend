@@ -16,6 +16,7 @@ import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -45,9 +46,15 @@ public class RequestsService {
                 .returnDate(requests.getReturnDate())
                 .createdBy(requests.getCreatedBy())
                 .build();
+        List<User> managers = userRepository.findByRoleName("MANAGER");
+        User requestUser = request.getUser();
+        String[] recipientEmails = Stream.concat(
+                Stream.of(requestUser.getEmail()), // Add requestUser's email
+                managers.stream().map(User::getEmail) // Add managers' emails
+        ).toArray(String[]::new);
 
         MailingDetails mailingDetails = MailingDetails.builder()
-                .recipient(new String[]{loggedInUser.getEmail()})
+                .recipient(recipientEmails)
                 .subject("File Checkout Request Confirmation")
                 .msgBody(String.format(
                         "Dear %s,%n%n" +
@@ -82,10 +89,15 @@ public class RequestsService {
             Requests request = requestOptional.get();
             request.setStage(newStage);
             Requests updatedRequest = requestsRepository.save(request);
-
+            List<User> managers = userRepository.findByRoleName("SUPERVISOR");
             User requestUser = request.getUser();
+            String[] recipientEmails = Stream.concat(
+                    Stream.of(requestUser.getEmail()), // Add requestUser's email
+                    managers.stream().map(User::getEmail) // Add managers' emails
+            ).toArray(String[]::new);
+
             MailingDetails mailingDetails = MailingDetails.builder()
-                    .recipient(new String[]{requestUser.getEmail()})
+                    .recipient(recipientEmails)
                     .subject("Request Status Update")
                     .msgBody(String.format(
                             "Dear %s,%n%n" +
@@ -119,7 +131,7 @@ public class RequestsService {
 
             User requestUser = request.getUser();
             MailingDetails mailingDetails = MailingDetails.builder()
-                    .recipient(new String[]{requestUser.getEmail()})
+                    .recipient(new String[]{getLoggedInUser().getEmail()})
                     .subject("Request Approved")
                     .msgBody(String.format(
                             "Dear %s,%n%n" +
@@ -148,7 +160,7 @@ public class RequestsService {
 
             User requestUser = request.getUser();
             MailingDetails mailingDetails = MailingDetails.builder()
-                    .recipient(new String[]{requestUser.getEmail()})
+                    .recipient(new String[] {getLoggedInUser().getEmail()})
                     .subject("Request Rejected")
                     .msgBody(String.format(
                             "Dear %s,%n%n" +

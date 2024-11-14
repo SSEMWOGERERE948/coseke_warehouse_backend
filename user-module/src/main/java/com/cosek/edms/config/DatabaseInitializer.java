@@ -35,9 +35,12 @@ public class DatabaseInitializer {
             Role superAdminRole = initializeSuperAdminRole(permissions);
             Role adminRole = initializeAdminRole(permissions);
             Role userRole = initializeUserRole(permissions);
+            Role supervisorRole = initializeSupervisorRole(permissions);
             initializeAdminUser(superAdminRole);
             initializeAdmUser(adminRole);
             initializeUser(userRole);
+            initializeSupervisor(supervisorRole);
+
 
         };
     }
@@ -115,9 +118,23 @@ public class DatabaseInitializer {
                 ).contains(permission.getName()))
                 .collect(Collectors.toSet());
 
-        return roleRepository.findByName(ADMIN)
+        return roleRepository.findByName(MANAGER)
                 .orElseGet(() -> roleRepository.save(
-                        new Role(null, ADMIN, null, adminPermissions)
+                        new Role(null, MANAGER, null, adminPermissions)
+                ));
+    }
+
+    private Role initializeSupervisorRole(List<Permission> permissions) {
+        Set<Permission> supervisorPermissions = permissions.stream()
+                .filter(permission -> List.of(
+                        CREATE_USER, READ_USER, UPDATE_USER, DELETE_USER,
+                        CREATE_ROLE, READ_ROLE, UPDATE_ROLE, DELETE_ROLE,CREATE_FILES
+                ).contains(permission.getName()))
+                .collect(Collectors.toSet());
+
+        return roleRepository.findByName(SUPERVISOR)
+                .orElseGet(() -> roleRepository.save(
+                        new Role(null, SUPERVISOR, null, supervisorPermissions)
                 ));
     }
 
@@ -155,5 +172,10 @@ public class DatabaseInitializer {
     private void initializeUser(Role userRole) {
         HashSet<Role> roles = new HashSet<>();
         roles.add(userRole);
+    }
+
+    private void initializeSupervisor(Role supervisorRole) {
+        HashSet<Role> roles = new HashSet<>();
+        roles.add(supervisorRole);
     }
 }

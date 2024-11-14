@@ -68,8 +68,10 @@ public class Constants {
     public static final String ADMIN_FIRST_NAME = "Admin";
     public static final String ADMIN_LAST_NAME = "Super";
     public static final String ADMIN_COUNTRY = "Uganda";
-    public static final String ADMIN = "ADMIN";
+    public static final String MANAGER = "MANAGER";
+    public static final String SUPERVISOR = "SUPERVISOR";
     public static final String USER = "USER";
+
 
     public static final String SUCCESSFUL_DELETION = "Delete Successful";
     public static final String FAILED_DELETION = "Delete Failed";
