@@ -7,6 +7,9 @@ import com.cosek.edms.role.RoleService;
 import com.cosek.edms.user.Models.CreateUserRequest;
 import com.cosek.edms.user.Models.UpdateUserRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,15 +25,16 @@ public class UserService {
     private final RoleService roleService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final PermissionService permissionService;
+    private final JavaMailSender mailSender;
+
+    private final Map<String, PasswordResetToken> resetTokens = new HashMap<>(); // To store tokens temporarily
 
     public User createUser(CreateUserRequest request) throws NotFoundException {
-        // Check if the email is already in use
         Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
         if (existingUser.isPresent()) {
             throw new IllegalArgumentException("Email is already in use: " + request.getEmail());
         }
 
-        // Create user entity without assigning a role
         User user = User.builder()
                 .first_name(request.getFirst_name())
                 .last_name(request.getLast_name())
@@ -38,11 +42,60 @@ public class UserService {
                 .phone(request.getPhone())
                 .address(request.getAddress())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .roles(Collections.emptySet()) // No roles initially
+                .roles(Collections.emptySet())
                 .build();
 
-        // Save and return the user
         return userRepository.save(user);
+    }
+
+    public String forgotPassword(String email) throws NotFoundException {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
+
+        // Generate a unique token
+        String token = UUID.randomUUID().toString();
+        resetTokens.put(token, new PasswordResetToken(user, token, new Date(System.currentTimeMillis() + 15 * 60 * 1000))); // 15 min expiry
+
+        // Send email with reset link (adjust the URL as needed)
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(user.getEmail());
+        message.setSubject("Password Reset Request");
+        message.setText("To reset your password, click the link below:\n" +
+                "http://y/reset-password?token=" + token);
+        mailSender.send(message);
+
+        return "Password reset email sent";
+    }
+
+    public String resetPassword(String token, String newPassword) {
+        PasswordResetToken resetToken = resetTokens.get(token);
+
+        if (resetToken == null || resetToken.isExpired()) {
+            throw new IllegalArgumentException("Invalid or expired token");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        // Invalidate the token after use
+        resetTokens.remove(token);
+
+        return "Password successfully reset";
+    }
+
+    public String updatePassword(Long userId, String currentPassword, String newPassword) throws NotFoundException {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+
+        // Verify the current password
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        // Set and encode the new password
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return "Password successfully updated";
     }
 
     public User assignUserTypes(Long userId, List<String> userTypes) throws NotFoundException {
@@ -90,7 +143,6 @@ public class UserService {
             }
         }
 
-        // Remove the specified roles
         currentRoles.removeAll(rolesToRemove);
         user.setRoles(currentRoles);
 
@@ -100,14 +152,12 @@ public class UserService {
     public User updateUser(UpdateUserRequest request, Long id) throws NotFoundException {
         User user = userRepository.findById(id).orElse(null);
 
-
         assert user != null;
         user.setFirst_name(request.getFirst_name());
         user.setLast_name(request.getLast_name());
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
         user.setAddress(request.getAddress());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
         return userRepository.save(user);
     }
 
@@ -143,9 +193,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-
     public Map<String, Object> deleteUser(Long id) {
-
         userRepository.deleteById(id);
         Optional<User> user = userRepository.findById(id);
 
@@ -163,4 +211,23 @@ public class UserService {
         return response;
     }
 
+    private static class PasswordResetToken {
+        private final User user;
+        private final String token;
+        private final Date expiryDate;
+
+        PasswordResetToken(User user, String token, Date expiryDate) {
+            this.user = user;
+            this.token = token;
+            this.expiryDate = expiryDate;
+        }
+
+        public User getUser() {
+            return user;
+        }
+
+        public boolean isExpired() {
+            return new Date().after(expiryDate);
+        }
+    }
 }

@@ -13,24 +13,24 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/v1")
+@RequestMapping("api/v1/users")
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/users")
+    @GetMapping
     public ResponseEntity<List<User>> findAll() {
         List<User> response = userService.findAllUsers();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<User> findUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findOneUser(id));
     }
 
-    @PostMapping("/users/create-users")
+    @PostMapping("/create-users")
     public ResponseEntity<User> createUser(@RequestBody CreateUserRequest request) {
         User response = null;
         try {
@@ -41,19 +41,19 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping("/users/{userID}/roles/{roleID}")
+    @PutMapping("/{userID}/roles/{roleID}")
     public ResponseEntity<User> addRoleToUser(@PathVariable Long userID, @PathVariable Long roleID) throws NotFoundException {
         User response = userService.addRoleToUser(userID, roleID);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Long id) {
         Map<String, Object> response = userService.deleteUser(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PutMapping("/users/update/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest update) {
         try {
             return ResponseEntity.ok(userService.updateUser(update, id));
@@ -62,12 +62,47 @@ public class UserController {
         }
     }
 
-    @PutMapping("/users/roles-update/{id}")
-    public  ResponseEntity<User> updateRoles(@PathVariable Long id, @RequestBody List<Role> roles) {
+    @PutMapping("/roles-update/{id}")
+    public ResponseEntity<User> updateRoles(@PathVariable Long id, @RequestBody List<Role> roles) {
         try {
             return ResponseEntity.ok(userService.updateRoles(id, roles));
         } catch (NotFoundException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    // Forgot Password Endpoint
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
+        try {
+            String response = userService.forgotPassword(email);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    // Reset Password Endpoint
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+        try {
+            String response = userService.resetPassword(token, newPassword);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Update Password Endpoint
+    @PutMapping("/update-password/{userId}")
+    public ResponseEntity<String> updatePassword(@PathVariable Long userId, @RequestParam String currentPassword, @RequestParam String newPassword) {
+        try {
+            String response = userService.updatePassword(userId, currentPassword, newPassword);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }

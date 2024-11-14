@@ -34,11 +34,6 @@ public class DepartmentService {
     }
 
     @Transactional(readOnly = true)
-    public List<Department> getDepartmentsByUserId(Long id) {
-        return departmentRepository.findAllByUserId(id);
-    }
-
-    @Transactional(readOnly = true)
     public Department getDepartmentByName(String departmentName) throws NotFoundException {
         return departmentRepository.findByDepartmentName(departmentName)
                 .orElseThrow(() -> new NotFoundException("Department not found with name: " + departmentName));
@@ -110,20 +105,11 @@ public class DepartmentService {
         return userRepository.save(user);
     }
 
-    public User unassignAllDepartmentsFromUser(Long userId) throws NotFoundException {
+    public List<Long> getDepartmentsByUserId(Long userId) throws NotFoundException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        // Clear all department assignments
-        user.getDepartments().clear();
-        return userRepository.save(user);
-    }
-
-
-    public List<Long> getDepartmentIdsByUserId(Long userId) throws NotFoundException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
-
+        // Assuming user has a collection of departments
         return user.getDepartments().stream()
                 .map(Department::getId)
                 .collect(Collectors.toList());

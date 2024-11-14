@@ -15,7 +15,6 @@ import com.cosek.edms.departments.DepartmentService;
 
 //import jakarta.validation.Valid;
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -43,18 +42,12 @@ public class DepartmentController {
         return ResponseEntity.ok(departmentService.getDepartmentById(id));
     }
 
-    @GetMapping("/departmentById/{id}")
-    public ResponseEntity<List<Department>> getDepartmentsByUserId(@PathVariable Long id) {
-        List<Department> departments = departmentService.getDepartmentsByUserId(id);
-        return ResponseEntity.ok(departments);
-    }
-
     @GetMapping("/{departmentName}")
     public ResponseEntity<Department> getDepartmentByName(@PathVariable String departmentName) throws NotFoundException {
         return ResponseEntity.ok(departmentService.getDepartmentByName(departmentName));
     }
 
-    @GetMapping("/")
+    @GetMapping("/all")
     public ResponseEntity<List<Department>> getAllDepartments() {
         return ResponseEntity.ok(departmentService.getAllDepartments());
     }
@@ -98,14 +91,12 @@ public class DepartmentController {
             Long userId = request.getUserId();
             List<Long> departmentIds = request.getDepartmentIds();
 
-            // If departmentIds is empty, unassign user from all departments
-            User updatedUser;
             if (departmentIds == null || departmentIds.isEmpty()) {
-                updatedUser = departmentService.unassignAllDepartmentsFromUser(userId);
-            } else {
-                updatedUser = departmentService.unassignUserDepartments(userId, departmentIds);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Department list cannot be empty.");
             }
 
+            // Unassign departments from the user
+            User updatedUser = departmentService.unassignUserDepartments(userId, departmentIds);
             return new ResponseEntity<>(updatedUser, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -113,15 +104,14 @@ public class DepartmentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
     }
+
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getUserDepartments(@PathVariable Long userId) {
+    public ResponseEntity<List<Long>> getDepartmentsByUserId(@PathVariable Long userId) {
         try {
-            List<Long> departmentIds = departmentService.getDepartmentIdsByUserId(userId);
-            return ResponseEntity.ok(Collections.singletonMap("departmentIds", departmentIds));
+            List<Long> departmentIds = departmentService.getDepartmentsByUserId(userId);
+            return ResponseEntity.ok(departmentIds);
         } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving departments.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 }

@@ -2,19 +2,26 @@ package com.cosek.edms.files;
 
 import com.cosek.edms.casestudy.CaseStudy;
 import com.cosek.edms.casestudy.CaseStudyRepository;
+import com.cosek.edms.departments.Department;
 import com.cosek.edms.exception.ResourceNotFoundException;
 import com.cosek.edms.folders.Folders;
 import com.cosek.edms.folders.FoldersRepository;
+import com.cosek.edms.requests.Requests;
+import com.cosek.edms.requests.RequestsRepository;
 import com.cosek.edms.user.User;
 import com.cosek.edms.user.UserRepository;
+import com.cosek.edms.user.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +31,7 @@ public class FilesService {
     private final UserRepository userRepository;
     private final CaseStudyRepository caseStudyRepository;
     private final FoldersRepository foldersRepository;
+    private final RequestsRepository requestsRepository;
 
 
     private User getLoggedInUser() {
@@ -69,8 +77,7 @@ public class FilesService {
         User loggedInUser = getLoggedInUser();
         return filesRepository.findById(id)
                 .map(file -> {
-                    file.setPIDInfant(updatedFile.getPIDInfant());
-                    file.setPIDMother(updatedFile.getPIDMother());
+                    file.setPID(updatedFile.getPID());
                     file.setBoxNumber(updatedFile.getBoxNumber());
                     file.setFolder(updatedFile.getFolder());
                     file.setResponsibleUser(loggedInUser);
@@ -114,4 +121,66 @@ public class FilesService {
         file.setFolder(folder);
         return filesRepository.save(file);
     }
+
+
+    public String checkFileIn(Long fileId) throws AccessDeniedException {
+        // Fetch the file by its ID
+        Files file = filesRepository.findById(fileId)
+                .orElseThrow(() -> new ResourceNotFoundException("File not found."));
+
+        // Fetch the current logged-in user
+        User currentUser = getLoggedInUser();
+
+        // Find all requests for this file
+        List<Requests> requests = requestsRepository.findByFilesAndUser(file, file.getResponsibleUser());
+
+        // Find active checkout requests (not returned)
+        List<Requests> activeRequests = requests.stream()
+                .filter(r -> Objects.equals(r.getFiles().getId(), fileId) &&
+                        !Objects.equals(r.getStage(), "Returned") &&
+                        Objects.equals(r.getStage(), "Approved"))
+                .toList();
+
+        // Check if file is actually checked out
+        if (activeRequests.isEmpty()) {
+            throw new IllegalStateException("This file has not been checked out.");
+        }
+
+        // Verify the current user is the one who checked it out
+        boolean isCheckedOutByCurrentUser = activeRequests.stream()
+                .anyMatch(r -> r.getUser().equals(currentUser));
+
+        if (!isCheckedOutByCurrentUser) {
+            throw new AccessDeniedException("Only the user who checked out the file can check it in.");
+        }
+
+        // Update all active requests to Returned status
+        activeRequests.forEach(request -> {
+            request.setStage("Returned");
+            requestsRepository.save(request);
+        });
+
+        // Update file status
+        file.setStatus("Available");
+        filesRepository.save(file);
+
+        return "File checked in successfully.";
+    }
+
+    public List<Files> getFilesByDepartments(Long userId) {
+        // Fetch user's department IDs
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (user.getDepartments() == null || user.getDepartments().isEmpty()) {
+            return List.of(); // Return empty if no departments assigned
+        }
+
+        List<Long> departmentIds = user.getDepartments().stream()
+                .map(Department::getId)
+                .collect(Collectors.toList());
+
+        return filesRepository.findFilesByDepartmentIds(departmentIds);
+    }
+
 }
