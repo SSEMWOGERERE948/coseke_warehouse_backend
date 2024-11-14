@@ -40,7 +40,6 @@ public class Files {
 
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "folder_id", referencedColumnName = "id")
-    @JsonBackReference("folder-files") // Unique value for folder reference
     private Folders folder;
 
     @ManyToOne(cascade = CascadeType.DETACH)

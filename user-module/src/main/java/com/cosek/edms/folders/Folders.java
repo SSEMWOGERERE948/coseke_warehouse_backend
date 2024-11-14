@@ -32,6 +32,7 @@ public class Folders {
     private Long id;
     private String folderName;
     @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Files> files;
 
     @CreatedDate
