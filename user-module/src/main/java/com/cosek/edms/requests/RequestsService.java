@@ -35,45 +35,45 @@ public class RequestsService {
         );
     }
 
-    public Requests createRequest(Requests requests) {
-        Files file = filesRepository.findById(requests.getFiles().getId()).orElseThrow();
-        User loggedInUser = getLoggedInUser();
-        Requests request = Requests.builder()
-                .files(file)
-                .user(loggedInUser)
-                .stage("Officer")
-                .state("In Progress")
-                .returnDate(requests.getReturnDate())
-                .createdBy(requests.getCreatedBy())
-                .build();
-        List<User> managers = userRepository.findByRoleName("MANAGER");
-        User requestUser = request.getUser();
-        String[] recipientEmails = Stream.concat(
-                Stream.of(requestUser.getEmail()), // Add requestUser's email
-                managers.stream().map(User::getEmail) // Add managers' emails
-        ).toArray(String[]::new);
-
-        MailingDetails mailingDetails = MailingDetails.builder()
-                .recipient(recipientEmails)
-                .subject("File Checkout Request Confirmation")
-                .msgBody(String.format(
-                        "Dear %s,%n%n" +
-                                "Your request to check out the file has been successfully submitted. Here are the details of your request:%n%n" +
-                                "PID: %s%n" +
-                                "Requested Return Date: %s%n%n" +
-                                "Your request is currently being reviewed at the 'Officer' stage and is marked as 'In Progress'.%n%n" +
-                                "You can check the status of your request at any time using the following link:%n" +
-                                "http://10.1.0.115/dashboard/tasks/my-requests%n%n" +
-                                "Thank you,%n" +
-                                "Records Management Team",
-                        loggedInUser.getFirst_name() + " " + loggedInUser.getLast_name(),
-                        file.getPID(),
-                        requests.getReturnDate().toLocalDate().toString()
-                ))
-                .build();
-        mailingService.sendMail(mailingDetails, "rams@baylor-uganda.org");
-        return requestsRepository.save(request);
-    }
+//    public Requests createRequest(Requests requests) {
+//        Files file = filesRepository.findById(requests.getFiles().getId()).orElseThrow();
+//        User loggedInUser = getLoggedInUser();
+//        Requests request = Requests.builder()
+//                .files(file)
+//                .user(loggedInUser)
+//                .stage("Officer")
+//                .state("In Progress")
+//                .returnDate(requests.getReturnDate())
+//                .createdBy(requests.getCreatedBy())
+//                .build();
+//        List<User> managers = userRepository.findByRoleName("MANAGER");
+//        User requestUser = request.getUser();
+//        String[] recipientEmails = Stream.concat(
+//                Stream.of(requestUser.getEmail()), // Add requestUser's email
+//                managers.stream().map(User::getEmail) // Add managers' emails
+//        ).toArray(String[]::new);
+//
+//        MailingDetails mailingDetails = MailingDetails.builder()
+//                .recipient(recipientEmails)
+//                .subject("File Checkout Request Confirmation")
+//                .msgBody(String.format(
+//                        "Dear %s,%n%n" +
+//                                "Your request to check out the file has been successfully submitted. Here are the details of your request:%n%n" +
+//                                "PID: %s%n" +
+//                                "Requested Return Date: %s%n%n" +
+//                                "Your request is currently being reviewed at the 'Officer' stage and is marked as 'In Progress'.%n%n" +
+//                                "You can check the status of your request at any time using the following link:%n" +
+//                                "http://10.1.0.115/dashboard/tasks/my-requests%n%n" +
+//                                "Thank you,%n" +
+//                                "Records Management Team",
+//                        loggedInUser.getFirst_name() + " " + loggedInUser.getLast_name(),
+//                        file.getPID(),
+//                        requests.getReturnDate().toLocalDate().toString()
+//                ))
+//                .build();
+//        mailingService.sendMail(mailingDetails, "rams@baylor-uganda.org");
+//        return requestsRepository.save(request);
+//    }
 
     public Optional<Requests> getRequestById(Long requestId) {
         return requestsRepository.findById(requestId);
@@ -149,34 +149,34 @@ public class RequestsService {
         return Optional.empty();
     }
 
-    public Optional<Requests> rejectRequest(Long requestId, String reason) {
-        Optional<Requests> requestOptional = requestsRepository.findById(requestId);
-        if (requestOptional.isPresent()) {
-            Requests request = requestOptional.get();
-            request.setStage("Rejected");
-            request.setState("Complete");
-            request.setReason(reason);
-            Requests updatedRequest = requestsRepository.save(request);
-
-            User requestUser = request.getUser();
-            MailingDetails mailingDetails = MailingDetails.builder()
-                    .recipient(new String[] {getLoggedInUser().getEmail()})
-                    .subject("Request Rejected")
-                    .msgBody(String.format(
-                            "Dear %s,%n%n" +
-                                    "Your request has for file with PID %s, been rejected for the following reason:%n" +
-                                    "%s%n%n" +
-                                    "If you have any questions, please contact support.%n%n" +
-                                    "Thank you,%n" +
-                                    "Records Management Team",
-                            requestUser.getFirst_name() + " " + requestUser.getLast_name(),
-                            request.getFiles().getPID(),
-                            reason
-                    ))
-                    .build();
-            mailingService.sendMail(mailingDetails, "rams@baylor-uganda.org");
-            return Optional.of(updatedRequest);
-        }
-        return Optional.empty();
-    }
+//    public Optional<Requests> rejectRequest(Long requestId, String reason) {
+//        Optional<Requests> requestOptional = requestsRepository.findById(requestId);
+//        if (requestOptional.isPresent()) {
+//            Requests request = requestOptional.get();
+//            request.setStage("Rejected");
+//            request.setState("Complete");
+//            request.setReason(reason);
+//            Requests updatedRequest = requestsRepository.save(request);
+//
+//            User requestUser = request.getUser();
+//            MailingDetails mailingDetails = MailingDetails.builder()
+//                    .recipient(new String[] {getLoggedInUser().getEmail()})
+//                    .subject("Request Rejected")
+//                    .msgBody(String.format(
+//                            "Dear %s,%n%n" +
+//                                    "Your request has for file with PID %s, been rejected for the following reason:%n" +
+//                                    "%s%n%n" +
+//                                    "If you have any questions, please contact support.%n%n" +
+//                                    "Thank you,%n" +
+//                                    "Records Management Team",
+//                            requestUser.getFirst_name() + " " + requestUser.getLast_name(),
+//                            request.getFiles().getPID(),
+//                            reason
+//                    ))
+//                    .build();
+//            mailingService.sendMail(mailingDetails, "rams@baylor-uganda.org");
+//            return Optional.of(updatedRequest);
+//        }
+//        return Optional.empty();
+//    }
 }

@@ -74,10 +74,10 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST, "/api/v1/permissions/remove").hasAuthority(DELETE_PERMISSION)
 
                                 // Case Studies permissions
-                                .requestMatchers(HttpMethod.GET, "/api/v1/case-studies/all","/api/v1/case-studies/{id}").hasAuthority(READ_CASESTUDIES)
-                                .requestMatchers(HttpMethod.POST, "/api/v1/case-studies/create-cases").hasAuthority(CREATE_CASESTUDIES)
-                                .requestMatchers(HttpMethod.PUT, "/api/v1/case-studies/assign-user","/api/v1/case-studies/update/{id}").hasAuthority(UPDATE_CASESTUDIES)
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/case-studies/delete/{id}").hasAuthority(DELETE_CASESTUDIES)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/case-studies/all","/api/v1/case-studies/{id}").hasAuthority(READ_FILECATEGORY)
+                                .requestMatchers(HttpMethod.POST, "/api/v1/case-studies/create-cases").hasAuthority(CREATE_FILECATEGORY)
+                                .requestMatchers(HttpMethod.PUT, "/api/v1/case-studies/assign-user","/api/v1/case-studies/update/{id}").hasAuthority(UPDATE_FILECATEGORY)
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/case-studies/delete/{id}").hasAuthority(DELETE_FILECATEGORY)
 
                                 // Files permissions
                                 .requestMatchers(HttpMethod.GET, "/api/v1/files/{id}").hasAuthority(READ_FILES)

@@ -80,10 +80,10 @@ public class DatabaseInitializer {
                 ensurePermission(DELETE_FOLDERS),
 
                 // New Case Studies permissions
-                ensurePermission(READ_CASESTUDIES),
-                ensurePermission(CREATE_CASESTUDIES),
-                ensurePermission(UPDATE_CASESTUDIES),
-                ensurePermission(DELETE_CASESTUDIES),
+                ensurePermission(READ_FILECATEGORY),
+                ensurePermission(CREATE_FILECATEGORY),
+                ensurePermission(UPDATE_FILECATEGORY),
+                ensurePermission(DELETE_FILECATEGORY),
 
                 // New Requests permissions
                 ensurePermission(READ_REQUESTS),

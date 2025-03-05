@@ -1,15 +1,15 @@
 package com.cosek.edms.files;
 
-import com.cosek.edms.casestudy.CaseStudy;
+import com.cosek.edms.filecategory.FileCategory;
 import com.cosek.edms.folders.Folders;
+import com.cosek.edms.locations.StorageLocation;
+import com.cosek.edms.organisation.Organization;
 import com.cosek.edms.user.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -29,13 +29,19 @@ public class Files {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String PID;
+
     private int boxNumber;
-    private String status;
+
+    @Column(nullable = false)
+    private String status = "Available"; // ✅ Default to Available
+
+    @Column(name = "checked_out_by", nullable = true)
+    private Long checkedOutBy;
+
 
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @JsonBackReference("user-files") // Unique value for user reference
+    @JsonBackReference("user-files")
     private User responsibleUser;
 
     @ManyToOne(cascade = CascadeType.DETACH)
@@ -44,8 +50,19 @@ public class Files {
 
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "case_study_id", referencedColumnName = "id")
-    @JsonBackReference("caseStudy-files") // Unique value for case study reference
-    private CaseStudy caseStudy;
+    @JsonBackReference("fileCategory-files")
+    private FileCategory fileCategory;
+
+    // Link files to an archival box
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "archival_box_id", referencedColumnName = "id")
+    @JsonIgnore // Prevents serialization of proxy objects
+    private StorageLocation archivalBox;
+
+    @ManyToOne(cascade = CascadeType.DETACH)
+    @JoinColumn(name = "organization_id", referencedColumnName = "id") // ✅ New field
+    private Organization organization; // ✅ Link file to organization
+
 
     @CreatedDate
     @Column(name = "createdDate", nullable = false, updatable = false)
@@ -63,4 +80,6 @@ public class Files {
     @Column(name = "createdBy", nullable = false, updatable = false)
     private Long createdBy;
 
+    @Column(columnDefinition = "TEXT")
+    private String metadataJson; // Stores all Excel columns as JSON
 }

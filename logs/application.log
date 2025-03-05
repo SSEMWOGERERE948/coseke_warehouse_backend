@@ -1,0 +1,164 @@
+2025-02-27 08:12:37 [restartedMain] INFO  com.cosek.edms.EdmsApplication - Starting EdmsApplication using Java 20.0.2 with PID 7916 (F:\coseke\coseke-warehouse\warehouse-Backend\file-managment-module\target\classes started by Trevor Simon in F:\coseke\coseke-warehouse\warehouse-Backend) 
+2025-02-27 08:12:37 [restartedMain] INFO  com.cosek.edms.EdmsApplication - No active profile set, falling back to 1 default profile: "default" 
+2025-02-27 08:12:37 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable 
+2025-02-27 08:12:37 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG' 
+2025-02-27 08:12:38 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode. 
+2025-02-27 08:12:38 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 120 ms. Found 11 JPA repository interfaces. 
+2025-02-27 08:12:40 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 7777 (http) 
+2025-02-27 08:12:40 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-7777"] 
+2025-02-27 08:12:40 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat] 
+2025-02-27 08:12:40 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.20] 
+2025-02-27 08:12:40 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext 
+2025-02-27 08:12:40 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2585 ms 
+2025-02-27 08:12:40 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default] 
+2025-02-27 08:12:40 [restartedMain] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.8.Final 
+2025-02-27 08:12:40 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled 
+2025-02-27 08:12:40 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer 
+2025-02-27 08:12:40 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting... 
+2025-02-27 08:12:41 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: a45a4c92-c5a7-4167-ab22-d7cb5299c3c0 
+2025-02-27 08:12:41 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed. 
+2025-02-27 08:12:41 [restartedMain] WARN  org.hibernate.orm.deprecation - HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default) 
+2025-02-27 08:12:43 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration) 
+2025-02-27 08:12:45 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default' 
+2025-02-27 08:12:46 [restartedMain] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used. 
+2025-02-27 08:12:46 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning 
+2025-02-27 08:12:47 [restartedMain] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 56 mappings in 'requestMappingHandlerMapping' 
+2025-02-27 08:12:47 [restartedMain] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping' 
+2025-02-27 08:12:47 [restartedMain] INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@50105268, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@54b8f1ca, org.springframework.security.web.context.SecurityContextHolderFilter@5b2c1dcb, org.springframework.security.web.header.HeaderWriterFilter@714c6c4, org.springframework.web.filter.CorsFilter@41e74913, org.springframework.security.web.authentication.logout.LogoutFilter@270c6f15, com.cosek.edms.config.RequestLoggingFilter@5255a2ce, com.cosek.edms.config.JwtAuthenticationFilter@7fbc07ad, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@3481eb9f, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@6de1fc17, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@514e18e, org.springframework.security.web.session.SessionManagementFilter@12401993, org.springframework.security.web.access.ExceptionTranslationFilter@56ebf403, org.springframework.security.web.access.intercept.AuthorizationFilter@2dc53d35] 
+2025-02-27 08:12:47 [restartedMain] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice 
+2025-02-27 08:12:47 [restartedMain] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 1 @ExceptionHandler, 1 ResponseBodyAdvice 
+2025-02-27 08:12:47 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729 
+2025-02-27 08:12:47 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-7777"] 
+2025-02-27 08:12:47 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 7777 (http) with context path '' 
+2025-02-27 08:12:47 [restartedMain] INFO  com.cosek.edms.EdmsApplication - Started EdmsApplication in 11.226 seconds (process running for 13.083) 
+2025-02-27 08:12:48 [restartedMain] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled. 
+2025-02-27 08:12:48 [restartedMain] ERROR o.s.boot.SpringApplication - Application run failed 
+org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: com.cosek.edms.permission.Permission.roles: could not initialize proxy - no Session
+	at org.hibernate.collection.spi.AbstractPersistentCollection.throwLazyInitializationException(AbstractPersistentCollection.java:634)
+	at org.hibernate.collection.spi.AbstractPersistentCollection.withTemporarySessionIfNeeded(AbstractPersistentCollection.java:217)
+	at org.hibernate.collection.spi.AbstractPersistentCollection.initialize(AbstractPersistentCollection.java:613)
+	at org.hibernate.collection.spi.AbstractPersistentCollection.read(AbstractPersistentCollection.java:136)
+	at org.hibernate.collection.spi.PersistentSet.hashCode(PersistentSet.java:412)
+	at com.cosek.edms.permission.Permission.hashCode(Permission.java:15)
+	at java.base/java.util.HashMap.hash(HashMap.java:338)
+	at java.base/java.util.HashMap.put(HashMap.java:618)
+	at java.base/java.util.HashSet.add(HashSet.java:229)
+	at java.base/java.util.AbstractCollection.addAll(AbstractCollection.java:338)
+	at java.base/java.util.HashSet.<init>(HashSet.java:121)
+	at com.cosek.edms.config.DatabaseInitializer.lambda$initializeAdminRole$2(DatabaseInitializer.java:62)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at com.cosek.edms.config.DatabaseInitializer.initializeAdminRole(DatabaseInitializer.java:62)
+	at com.cosek.edms.config.DatabaseInitializer.lambda$initDatabase$0(DatabaseInitializer.java:33)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:510)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.cosek.edms.EdmsApplication.main(EdmsApplication.java:16)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:578)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50)
+2025-02-27 08:12:48 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default' 
+2025-02-27 08:12:48 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated... 
+2025-02-27 08:12:48 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed. 
+2025-02-27 08:12:57 [restartedMain] INFO  com.cosek.edms.EdmsApplication - Starting EdmsApplication using Java 20.0.2 with PID 31012 (F:\coseke\coseke-warehouse\warehouse-Backend\file-managment-module\target\classes started by Trevor Simon in F:\coseke\coseke-warehouse\warehouse-Backend) 
+2025-02-27 08:12:57 [restartedMain] INFO  com.cosek.edms.EdmsApplication - No active profile set, falling back to 1 default profile: "default" 
+2025-02-27 08:12:57 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable 
+2025-02-27 08:12:57 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG' 
+2025-02-27 08:12:58 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode. 
+2025-02-27 08:12:58 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 115 ms. Found 11 JPA repository interfaces. 
+2025-02-27 08:12:59 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 7777 (http) 
+2025-02-27 08:12:59 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-7777"] 
+2025-02-27 08:12:59 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat] 
+2025-02-27 08:12:59 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.20] 
+2025-02-27 08:12:59 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext 
+2025-02-27 08:12:59 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2417 ms 
+2025-02-27 08:13:00 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default] 
+2025-02-27 08:13:00 [restartedMain] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.8.Final 
+2025-02-27 08:13:00 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled 
+2025-02-27 08:13:00 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer 
+2025-02-27 08:13:00 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting... 
+2025-02-27 08:13:00 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: fac55c31-cf6f-46b0-ab91-5cc9a8213989 
+2025-02-27 08:13:00 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed. 
+2025-02-27 08:13:00 [restartedMain] WARN  org.hibernate.orm.deprecation - HHH90000025: SQLServerDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default) 
+2025-02-27 08:13:02 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration) 
+2025-02-27 08:13:04 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default' 
+2025-02-27 08:13:05 [restartedMain] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used. 
+2025-02-27 08:13:05 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning 
+2025-02-27 08:13:06 [restartedMain] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 56 mappings in 'requestMappingHandlerMapping' 
+2025-02-27 08:13:06 [restartedMain] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping' 
+2025-02-27 08:13:06 [restartedMain] INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@64e3d71c, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@59b9a6ca, org.springframework.security.web.context.SecurityContextHolderFilter@cb17ee, org.springframework.security.web.header.HeaderWriterFilter@139ac9ba, org.springframework.web.filter.CorsFilter@4096998b, org.springframework.security.web.authentication.logout.LogoutFilter@578d9cc9, com.cosek.edms.config.RequestLoggingFilter@7b36e058, com.cosek.edms.config.JwtAuthenticationFilter@13df5b4e, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@41a1fdc6, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@2c08f95a, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@4d733b28, org.springframework.security.web.session.SessionManagementFilter@72e901a0, org.springframework.security.web.access.ExceptionTranslationFilter@2db4de78, org.springframework.security.web.access.intercept.AuthorizationFilter@11b59a50] 
+2025-02-27 08:13:06 [restartedMain] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice 
+2025-02-27 08:13:06 [restartedMain] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 1 @ExceptionHandler, 1 ResponseBodyAdvice 
+2025-02-27 08:13:06 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729 
+2025-02-27 08:13:06 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-7777"] 
+2025-02-27 08:13:06 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 7777 (http) with context path '' 
+2025-02-27 08:13:06 [restartedMain] INFO  com.cosek.edms.EdmsApplication - Started EdmsApplication in 9.95 seconds (process running for 10.976) 
+2025-02-27 08:13:06 [restartedMain] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled. 
+2025-02-27 08:13:06 [restartedMain] ERROR o.s.boot.SpringApplication - Application run failed 
+java.lang.IllegalStateException: Failed to execute CommandLineRunner
+	at org.springframework.boot.SpringApplication.lambda$callRunner$6(SpringApplication.java:797)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:66)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:510)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.cosek.edms.EdmsApplication.main(EdmsApplication.java:16)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:578)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50)
+Caused by: java.lang.Exception: Could not initialize storage
+	at com.cosek.edms.filemanager.FileManagerService.init(FileManagerService.java:349)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:578)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:354)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:716)
+	at com.cosek.edms.filemanager.FileManagerService$$SpringCGLIB$$0.init(<generated>)
+	at com.cosek.edms.EdmsApplication.lambda$init$0(EdmsApplication.java:23)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	... 20 common frames omitted
+Caused by: java.nio.file.AccessDeniedException: C:\Users\Ssali Benjamin
+	at java.base/sun.nio.fs.WindowsException.translateToIOException(WindowsException.java:89)
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:103)
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(WindowsException.java:108)
+	at java.base/sun.nio.fs.WindowsFileSystemProvider.createDirectory(WindowsFileSystemProvider.java:527)
+	at java.base/java.nio.file.Files.createDirectory(Files.java:699)
+	at java.base/java.nio.file.Files.createAndCheckIsDirectory(Files.java:806)
+	at java.base/java.nio.file.Files.createDirectories(Files.java:792)
+	at com.cosek.edms.filemanager.FileManagerService.init(FileManagerService.java:346)
+	... 29 common frames omitted
+2025-02-27 08:13:06 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default' 
+2025-02-27 08:13:06 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated... 
+2025-02-27 08:13:06 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed. 

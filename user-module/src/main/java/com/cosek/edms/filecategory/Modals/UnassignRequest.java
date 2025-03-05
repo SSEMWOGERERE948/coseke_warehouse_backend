@@ -1,4 +1,4 @@
-package com.cosek.edms.casestudy.Modals;
+package com.cosek.edms.filecategory.Modals;
 
 import lombok.Data;
 
@@ -6,6 +6,6 @@ import java.util.List;
 
 @Data
 public class UnassignRequest {
-    private Long caseStudyId;
+    private Long fileCategoryId;
     private Long userId;
 }

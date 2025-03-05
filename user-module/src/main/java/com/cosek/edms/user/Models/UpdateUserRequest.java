@@ -11,4 +11,5 @@ public class UpdateUserRequest {
     private String phone;
     private String address;
     private String password;
+    private Long organizationId;
 }

@@ -1,4 +1,4 @@
-package com.cosek.edms.casestudy;
+package com.cosek.edms.filecategory;
 
 import com.cosek.edms.files.Files;
 import com.cosek.edms.user.User;
@@ -18,8 +18,8 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "case_study")
-public class CaseStudy {
+@Table(name = "file_category")
+public class FileCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,14 +27,14 @@ public class CaseStudy {
     private String name;
     private String description;
 
-    @OneToMany(mappedBy = "caseStudy", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "fileCategory", cascade = CascadeType.ALL)
     private List<Files> files;
 
     // Many-to-many relationship with users
     @ManyToMany
     @JoinTable(
-            name = "case_study_user",
-            joinColumns = @JoinColumn(name = "case_study_id"),
+            name = "file_category_user",
+            joinColumns = @JoinColumn(name = "file_category_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> users = new HashSet<>();
@@ -42,8 +42,8 @@ public class CaseStudy {
     // Many-to-many relationship with roles
     @ManyToMany
     @JoinTable(
-            name = "case_study_role",
-            joinColumns = @JoinColumn(name = "case_study_id"),
+            name = "file_category_role",
+            joinColumns = @JoinColumn(name = "file_category_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();

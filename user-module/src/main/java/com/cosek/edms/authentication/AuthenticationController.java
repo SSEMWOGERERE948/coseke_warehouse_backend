@@ -16,9 +16,10 @@ public class AuthenticationController {
     @PostMapping("/register/{roleID}")
     public ResponseEntity<AuthenticationResponse> register(
             @PathVariable Long roleID,
-            @RequestBody RegisterRequest request
+            @RequestBody RegisterRequest request,
+            @PathVariable Long organizationId
     ) {
-        return ResponseEntity.ok(authenticationService.register(request, roleID));
+        return ResponseEntity.ok(authenticationService.register(request, roleID, organizationId)); // ✅ Pass all three parameters
     }
 
     @PostMapping("/authenticate")

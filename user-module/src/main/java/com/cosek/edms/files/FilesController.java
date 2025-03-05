@@ -1,10 +1,9 @@
 package com.cosek.edms.files;
 
-import com.cosek.edms.casestudy.CaseStudy;
-import com.cosek.edms.casestudy.CaseStudyRepository;
-import com.cosek.edms.casestudy.CaseStudyService;
+import com.cosek.edms.filecategory.FileCategoryService;
 import com.cosek.edms.exception.ResourceNotFoundException;
-import com.cosek.edms.folders.Folders;
+import com.cosek.edms.files.Models.BulkFileUploadRequest;
+import com.cosek.edms.files.Models.FileRequest;
 import com.cosek.edms.folders.FoldersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/v1/files")
@@ -23,20 +22,15 @@ import java.util.Optional;
 public class FilesController {
 
     private final FilesService filesService;
+    private final FilesRepository filesRepository;
 
     @Autowired
-    private CaseStudyService caseStudyService;
+    private FileCategoryService fileCategoryService;
 
     @Autowired
     private final FoldersService foldersService;
 
 
-
-    @PostMapping("/add")
-    public ResponseEntity<Files> addFile(@RequestBody Files file) {
-        Files savedFile = filesService.addFile(file);
-        return ResponseEntity.ok(savedFile);
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Files> getFileById(@PathVariable Long id) {
@@ -46,10 +40,52 @@ public class FilesController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Files>> getAllFiles() {
-        List<Files> files = filesService.getAllFiles();
-        return ResponseEntity.ok(files);
+    public ResponseEntity<Map<String, Object>> getAllFiles(
+            @RequestParam(required = false) Long organizationId,
+            @RequestParam(required = false) boolean isSuperAdmin) {
+
+        System.out.println("isSuperAdmin: " + isSuperAdmin);
+        System.out.println("organizationId: " + organizationId);
+
+        Map<String, Object> response = new HashMap<>();
+        List<Files> files;
+
+        if (isSuperAdmin) {
+            files = filesRepository.findAll(); // ✅ Super Admin gets all files
+
+            // ✅ Fetch only rackName, shelfName, and archivalBoxName for super admin
+            List<Object[]> allArchivalBoxes = filesRepository.findAllArchivalBoxesWithHierarchy();
+            List<Map<String, Object>> formattedBoxes = formatFilteredArchivalBoxes(allArchivalBoxes);
+            response.put("archivalBoxes", formattedBoxes);
+        } else if (organizationId != null) {
+            files = filesRepository.findByOrganizationId(organizationId); // ✅ Org users see only their files
+
+            // ✅ Fetch filtered archival boxes for organization
+            List<Object[]> archivalBoxes = filesRepository.findArchivalBoxesWithHierarchyByOrganization(organizationId);
+            List<Map<String, Object>> formattedBoxes = formatFilteredArchivalBoxes(archivalBoxes);
+            response.put("archivalBoxes", formattedBoxes);
+        } else {
+            files = new ArrayList<>(); // ✅ Return empty if no filtering criteria
+            response.put("archivalBoxes", new ArrayList<>());
+        }
+
+        response.put("files", files);
+
+        return ResponseEntity.ok(response);
     }
+
+    private List<Map<String, Object>> formatFilteredArchivalBoxes(List<Object[]> boxes) {
+        return boxes.stream()
+                .map(box -> {
+                    Map<String, Object> boxMap = new HashMap<>();
+                    boxMap.put("rackName", box[0]);        // ✅ Rack Name
+                    boxMap.put("shelfName", box[1]);       // ✅ Shelf Name
+                    boxMap.put("archivalBoxName", box[2]); // ✅ Archival Box Name
+                    return boxMap;
+                })
+                .collect(Collectors.toList());
+    }
+
 
     @PostMapping("/{fileId}/check-in")
     public ResponseEntity<String> checkFileIn(@PathVariable Long fileId) {
@@ -65,17 +101,32 @@ public class FilesController {
         }
     }
 
+    @PostMapping("/{fileId}/check-out")
+    public ResponseEntity<String> checkFileOut(@PathVariable Long fileId) {
+        try {
+            String message = filesService.checkFileOut(fileId);
+            return ResponseEntity.ok(message);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
+    }
+
+
     @GetMapping("all/{id}")
     public ResponseEntity<List<Files>> getAllFilesById(@PathVariable Long id) {
         List<Files> files = filesService.getFilesByCreator(id);
         return ResponseEntity.ok(files);
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Files> updateFile(@PathVariable Long id, @RequestBody Files updatedFile) {
-        Files file = filesService.updateFile(id, updatedFile);
-        return ResponseEntity.ok(file);
-    }
+//    @PutMapping("/update/{id}")
+//    public ResponseEntity<Files> updateFile(@PathVariable Long id, @RequestBody Files updatedFile) {
+//        Files file = filesService.updateFile(id, updatedFile);
+//        return ResponseEntity.ok(file);
+//    }
 
     @PutMapping("/update-multiple")
     public ResponseEntity<List<Files>> updateMultipleFiles(@RequestBody List<Files> files) {
@@ -95,12 +146,12 @@ public class FilesController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{fileId}/assign-case-study/{caseStudyId}")
-    public ResponseEntity<Files> assignFileToCaseStudy(
+    @PutMapping("/{fileId}/assign-case-study/{fileCategoryId}")
+    public ResponseEntity<Files> assignFileToFileCategory(
             @PathVariable Long fileId,
-            @PathVariable Long caseStudyId) {
+            @PathVariable Long fileCategoryId) {
 
-        Files updatedFile = filesService.assignFileToCaseStudy(fileId, caseStudyId);
+        Files updatedFile = filesService.assignFileToFileCategory(fileId, fileCategoryId);
         return ResponseEntity.ok(updatedFile);
     }
 
@@ -113,9 +164,21 @@ public class FilesController {
         return ResponseEntity.ok(updatedFile);
     }
 
-    @GetMapping("/by-departments/{userId}")
-    public ResponseEntity<List<Files>> getFilesByDepartments(@PathVariable Long userId) {
-        List<Files> files = filesService.getFilesByDepartments(userId);
-        return ResponseEntity.ok(files);
+    @PostMapping("/add")
+    public ResponseEntity<Files> addFile(@RequestBody FileRequest fileRequest) {
+        Files savedFile = filesService.addFile(fileRequest);
+        return ResponseEntity.ok(savedFile);
     }
+
+    @PostMapping("/bulk-upload")
+    public ResponseEntity<?> bulkUpload(@RequestBody BulkFileUploadRequest bulkRequest) {
+        try {
+            List<Files> uploadedFiles = filesService.bulkUpload(bulkRequest);
+            return ResponseEntity.ok(uploadedFiles);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading files.");
+        }
+    }
+
+
 }

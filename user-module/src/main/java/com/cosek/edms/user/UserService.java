@@ -3,11 +3,14 @@ package com.cosek.edms.user;
 import com.cosek.edms.MailingService.MailingDetails;
 import com.cosek.edms.MailingService.MailingServiceService;
 import com.cosek.edms.exception.NotFoundException;
+import com.cosek.edms.organisation.Organization;
+import com.cosek.edms.organisation.OrganizationRepository;
 import com.cosek.edms.permission.PermissionService;
 import com.cosek.edms.role.Role;
 import com.cosek.edms.role.RoleService;
 import com.cosek.edms.user.Models.CreateUserRequest;
 import com.cosek.edms.user.Models.UpdateUserRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -28,6 +31,7 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final PermissionService permissionService;
     private final MailingServiceService mailingService;
+    private final OrganizationRepository organizationRepository; // ✅ Inject Organization Repository
 
     private final Map<String, PasswordResetToken> resetTokens = new HashMap<>(); // To store tokens temporarily
 
@@ -154,18 +158,26 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
     public User updateUser(UpdateUserRequest request, Long id) throws NotFoundException {
-        User user = userRepository.findById(id).orElse(null);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
 
-        assert user != null;
         user.setFirst_name(request.getFirst_name());
         user.setLast_name(request.getLast_name());
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
         user.setAddress(request.getAddress());
+
+        // ✅ Handle Organization update
+        if (request.getOrganizationId() != null) {
+            Organization organization = organizationRepository.findById(request.getOrganizationId())
+                    .orElseThrow(() -> new NotFoundException("Organization not found with id: " + request.getOrganizationId()));
+            user.setOrganization(organization);
+        }
+
         return userRepository.save(user);
     }
-
     public List<User> findAllUsers() {
         return userRepository.findAll();
     }

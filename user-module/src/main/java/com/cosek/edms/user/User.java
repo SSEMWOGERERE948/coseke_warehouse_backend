@@ -1,17 +1,14 @@
 package com.cosek.edms.user;
 
 import com.cosek.edms.requests.Requests;
-import com.cosek.edms.casestudy.CaseStudy;
-import com.cosek.edms.departments.Department;
+import com.cosek.edms.filecategory.FileCategory;
 import com.cosek.edms.files.Files;
+import com.cosek.edms.organisation.Organization;
 import com.cosek.edms.role.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -44,6 +41,10 @@ public class User implements UserDetails {
     private String address;
     private String password;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organization_id", referencedColumnName = "id")
+    private Organization organization;  // ✅ NEW: Link to Organization
+
     @OneToMany(mappedBy="user")
     @JsonIgnore
     private List<Requests> requests;
@@ -63,10 +64,6 @@ public class User implements UserDetails {
     @CreatedBy
     @Column(name="createdBy", nullable = true, updatable = false)
     private Long createdBy;
-
-    @ManyToOne(cascade = CascadeType.DETACH)
-    @JoinColumn(name = "department_id", referencedColumnName = "id")
-    private Department department;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -88,10 +85,9 @@ public class User implements UserDetails {
                 .collect(Collectors.toList());
     }
 
-    // Many-to-many relationship with case studies
     @ManyToMany(mappedBy = "users")
     @JsonIgnore
-    private Set<CaseStudy> caseStudies = new HashSet<>();
+    private Set<FileCategory> caseStudies = new HashSet<>();
 
     @Override
     public String getPassword() {
@@ -122,38 +118,4 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(id, user.id);
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", first_name='" + first_name + '\'' +
-                ", last_name='" + last_name + '\'' +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", address='" + address + '\'' +
-                '}';
-    }
-
-    @ManyToMany(fetch = FetchType.EAGER) // Eagerly load departments
-    @JoinTable(
-            name = "user_departments",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "department_id")
-    )
-    private Set<Department> departments;
-
 }

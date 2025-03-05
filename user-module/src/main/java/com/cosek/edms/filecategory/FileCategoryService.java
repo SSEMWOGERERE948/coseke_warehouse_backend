@@ -1,8 +1,8 @@
-package com.cosek.edms.casestudy;
+package com.cosek.edms.filecategory;
 
 import com.cosek.edms.user.User;
 import com.cosek.edms.role.Role;
-import com.cosek.edms.casestudy.Modals.CaseStudyRequest;
+import com.cosek.edms.filecategory.Modals.FileCategoryRequest;
 import com.cosek.edms.exception.NotFoundException;
 import com.cosek.edms.role.RoleRepository;
 import com.cosek.edms.user.UserRepository;
@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class CaseStudyService {
+public class FileCategoryService {
 
     @Autowired
-    private CaseStudyRepository caseStudyRepository;
+    private FileCategoryRepository fileCategoryRepository;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -24,52 +24,52 @@ public class CaseStudyService {
     private  UserRepository userRepository;
 
     // Fetch all case studies
-    public List<CaseStudy> getAllCaseStudies() {
-        return caseStudyRepository.findAll();
+    public List<FileCategory> getAllFileCategories() {
+        return fileCategoryRepository.findAll();
     }
 
     // Get a case study by ID
-    public Optional<CaseStudy> getCaseStudyById(Long id) {
-        return caseStudyRepository.findById(id);
+    public Optional<FileCategory> getFileCategoryById(Long id) {
+        return fileCategoryRepository.findById(id);
     }
 
-    public CaseStudy findCaseStudyById(Long caseStudyId) {
-        return caseStudyRepository.findCaseStudyById(caseStudyId);
+    public FileCategory findFileCategoryById(Long fileCategoryId) {
+        return fileCategoryRepository.findFileCategoryById(fileCategoryId);
     }
 
     // Save a new case study
-    public CaseStudy saveCaseStudy(CaseStudy caseStudy) {
-        return caseStudyRepository.save(caseStudy);
+    public FileCategory saveFileCategory(FileCategory fileCategory) {
+        return fileCategoryRepository.save(fileCategory);
     }
 
     // Update an existing case study
-    public CaseStudy updateCaseStudy(Long id, CaseStudy updatedCaseStudy) {
-        Optional<CaseStudy> caseStudyOptional = caseStudyRepository.findById(id);
-        if (caseStudyOptional.isEmpty()) {
+    public FileCategory updateFileCategory(Long id, FileCategory updatedFileCategory) {
+        Optional<FileCategory> fileCategoryOptional = fileCategoryRepository.findById(id);
+        if (fileCategoryOptional.isEmpty()) {
             throw new RuntimeException("Case study not found");
         }
 
-        CaseStudy caseStudy = caseStudyOptional.get();
-        caseStudy.setName(updatedCaseStudy.getName());
-        caseStudy.setDescription(updatedCaseStudy.getDescription());
-        caseStudy.setUsers(updatedCaseStudy.getUsers());
-        return caseStudyRepository.save(caseStudy);
+        FileCategory fileCategory = fileCategoryOptional.get();
+        fileCategory.setName(updatedFileCategory.getName());
+        fileCategory.setDescription(updatedFileCategory.getDescription());
+        fileCategory.setUsers(updatedFileCategory.getUsers());
+        return fileCategoryRepository.save(fileCategory);
     }
 
     // Delete a case study
-    public void deleteCaseStudy(Long id) {
-        caseStudyRepository.deleteById(id);
+    public void deleteFileCategory(Long id) {
+        fileCategoryRepository.deleteById(id);
     }
 
-    public CaseStudy createCaseStudy(CaseStudyRequest request, Set<Role> roles, Set<User> users) {
-        CaseStudy newCaseStudy = CaseStudy.builder()
+    public FileCategory createFileCategory(FileCategoryRequest request, Set<Role> roles, Set<User> users) {
+        FileCategory newFileCategory = FileCategory.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .users(users == null ? new HashSet<>() : users)
                 .roles(roles == null ? new HashSet<>() : roles)  // Assign roles set
                 .build();
 
-        return caseStudyRepository.save(newCaseStudy);
+        return fileCategoryRepository.save(newFileCategory);
     }
 
     // Find a role by ID for assignment
@@ -78,13 +78,13 @@ public class CaseStudyService {
                 .orElseThrow(() -> new NotFoundException("Role not found"));
     }
 
-    public CaseStudy assignUsersToCaseStudy(Long caseStudyId, List<Long> userIds) throws NotFoundException {
-        Optional<CaseStudy> caseStudyOptional = caseStudyRepository.findById(caseStudyId);
-        if (caseStudyOptional.isEmpty()) {
+    public FileCategory assignUsersToFileCategory(Long fileCategoryId, List<Long> userIds) throws NotFoundException {
+        Optional<FileCategory> fileCategoryOptional = fileCategoryRepository.findById(fileCategoryId);
+        if (fileCategoryOptional.isEmpty()) {
             throw new NotFoundException("Case Study not found");
         }
 
-        CaseStudy caseStudy = caseStudyOptional.get();
+        FileCategory fileCategory = fileCategoryOptional.get();
         List<User> usersToAdd = new ArrayList<>();
 
         for (Long userId : userIds) {
@@ -96,20 +96,20 @@ public class CaseStudyService {
         }
 
         // Add all users to the case study's set of users
-        caseStudy.getUsers().addAll(usersToAdd);
+        fileCategory.getUsers().addAll(usersToAdd);
 
         // Persist the updated case study
-        return caseStudyRepository.save(caseStudy);
+        return fileCategoryRepository.save(fileCategory);
     }
 
-    public CaseStudy unassignUsersFromCaseStudy(Long caseStudyId, Long userId) throws NotFoundException {
-        // Fetch the CaseStudy by ID
-        Optional<CaseStudy> caseStudyOptional = caseStudyRepository.findById(caseStudyId);
-        if (caseStudyOptional.isEmpty()) {
+    public FileCategory unassignUsersFromFileCategory(Long fileCategoryId, Long userId) throws NotFoundException {
+        // Fetch the FileCategory by ID
+        Optional<FileCategory> fileCategoryOptional = fileCategoryRepository.findById(fileCategoryId);
+        if (fileCategoryOptional.isEmpty()) {
             throw new NotFoundException("Case Study not found");
         }
 
-        CaseStudy caseStudy = caseStudyOptional.get();
+        FileCategory fileCategory = fileCategoryOptional.get();
 
         // Fetch the User by ID
         Optional<User> userOptional = userRepository.findById(userId);
@@ -120,20 +120,20 @@ public class CaseStudyService {
         User userToRemove = userOptional.get();
 
         // Check if the user is assigned to the case study
-        if (!caseStudy.getUsers().contains(userToRemove)) {
+        if (!fileCategory.getUsers().contains(userToRemove)) {
             throw new NotFoundException("User with ID " + userId + " is not assigned to this case study");
         }
 
         // Remove the user from the case study's set of users
-        caseStudy.getUsers().remove(userToRemove);
+        fileCategory.getUsers().remove(userToRemove);
 
         // Persist the updated case study
-        return caseStudyRepository.save(caseStudy);
+        return fileCategoryRepository.save(fileCategory);
     }
 
-    public List<User> getAssignedUsers(Long caseStudyId) throws NotFoundException {
+    public List<User> getAssignedUsers(Long fileCategoryId) throws NotFoundException {
         // Find user IDs assigned to the case study
-        List<Long> userIds = caseStudyRepository.findAssignedUserIdsByCaseStudyId(caseStudyId);
+        List<Long> userIds = fileCategoryRepository.findAssignedUserIdsByFileCategoryId(fileCategoryId);
 
         if (userIds.isEmpty()) {
             throw new NotFoundException("No users assigned to this case study");

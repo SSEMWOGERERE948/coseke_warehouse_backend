@@ -40,10 +40,10 @@ public class Constants {
     public static final String DELETE_FOLDERS = "DELETE_FOLDERS";
 
     // New Case Studies permissions
-    public static final String READ_CASESTUDIES = "READ_CASESTUDIES";
-    public static final String CREATE_CASESTUDIES = "CREATE_CASESTUDIES";
-    public static final String UPDATE_CASESTUDIES = "UPDATE_CASESTUDIES";
-    public static final String DELETE_CASESTUDIES = "DELETE_CASESTUDIES";
+    public static final String READ_FILECATEGORY = "READ_FILECATEGORY";
+    public static final String CREATE_FILECATEGORY = "CREATE_FILECATEGORY";
+    public static final String UPDATE_FILECATEGORY = "UPDATE_FILECATEGORY";
+    public static final String DELETE_FILECATEGORY = "DELETE_FILECATEGORY";
 
     public static final String READ_REQUESTS = "READ_REQUESTS";
     public static final String CREATE_REQUESTS = "CREATE_REQUESTS";

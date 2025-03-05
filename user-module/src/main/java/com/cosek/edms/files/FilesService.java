@@ -1,38 +1,44 @@
 package com.cosek.edms.files;
 
-import com.cosek.edms.casestudy.CaseStudy;
-import com.cosek.edms.casestudy.CaseStudyRepository;
-import com.cosek.edms.departments.Department;
+import com.cosek.edms.filecategory.FileCategory;
+import com.cosek.edms.filecategory.FileCategoryRepository;
 import com.cosek.edms.exception.ResourceNotFoundException;
+import com.cosek.edms.files.Models.BulkFileUploadRequest;
+import com.cosek.edms.files.Models.FileRequest;
 import com.cosek.edms.folders.Folders;
 import com.cosek.edms.folders.FoldersRepository;
+import com.cosek.edms.locations.StorageLocation;
+import com.cosek.edms.locations.StorageLocationRepository;
+import com.cosek.edms.organisation.Organization;
+import com.cosek.edms.organisation.OrganizationRepository;
 import com.cosek.edms.requests.Requests;
 import com.cosek.edms.requests.RequestsRepository;
 import com.cosek.edms.user.User;
 import com.cosek.edms.user.UserRepository;
-import com.cosek.edms.user.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class FilesService {
 
-    private final FilesRepository filesRepository;
     private final UserRepository userRepository;
-    private final CaseStudyRepository caseStudyRepository;
+    private final FileCategoryRepository fileCategoryRepository;
     private final FoldersRepository foldersRepository;
     private final RequestsRepository requestsRepository;
+    private final StorageLocationRepository storageLocationRepository;
+    private final OrganizationRepository organizationRepository;
 
+    private final FilesRepository filesRepository;
 
     private User getLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -43,10 +49,10 @@ public class FilesService {
     }
 
     public Files addFile(Files file) {
-        if (file.getCaseStudy() != null && file.getCaseStudy().getId() != null) {
-            CaseStudy caseStudy = caseStudyRepository.findById(file.getCaseStudy().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("CaseStudy not found"));
-            file.setCaseStudy(caseStudy);
+        if (file.getFileCategory() != null && file.getFileCategory().getId() != null) {
+            FileCategory fileCategory = fileCategoryRepository.findById(file.getFileCategory().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("FileCategory not found"));
+            file.setFileCategory(fileCategory);
         }
 
         if (file.getFolder() != null && file.getFolder().getId() != null) {
@@ -64,27 +70,40 @@ public class FilesService {
         return filesRepository.findById(id);
     }
 
-    public List<Files> getAllFiles() {
-        return filesRepository.findAll();
-    }
+        public List<Files> getAllFiles(Long organizationId, boolean isSuperAdmin) {
+            System.out.println("isSuperAdmin: " + isSuperAdmin); // ✅ Debug Log
+            System.out.println("organizationId: " + organizationId);
+
+            if (isSuperAdmin) {
+                return filesRepository.findAll(); // ✅ SUPER_ADMIN gets all files
+            }
+
+            if (organizationId != null) {
+                return filesRepository.findByOrganizationId(organizationId); // ✅ Other users see only their org
+            }
+
+            return new ArrayList<>(); // ✅ Fallback (should never happen)
+        }
+
+
 
     // Fetch files by the creator (for ADMIN and USER roles)
     public List<Files> getFilesByCreator(Long id) {
         return filesRepository.findByCreatedBy(id);
     }
 
-    public Files updateFile(Long id, Files updatedFile) {
-        User loggedInUser = getLoggedInUser();
-        return filesRepository.findById(id)
-                .map(file -> {
-                    file.setPID(updatedFile.getPID());
-                    file.setBoxNumber(updatedFile.getBoxNumber());
-                    file.setFolder(updatedFile.getFolder());
-                    file.setResponsibleUser(loggedInUser);
-                    return filesRepository.save(file);
-                })
-                .orElseThrow(() -> new ResourceNotFoundException("File not found with id " + id));
-    }
+//    public Files updateFile(Long id, Files updatedFile) {
+//        User loggedInUser = getLoggedInUser();
+//        return filesRepository.findById(id)
+//                .map(file -> {
+//                    file.setPID(updatedFile.getPID());
+//                    file.setBoxNumber(updatedFile.getBoxNumber());
+//                    file.setFolder(updatedFile.getFolder());
+//                    file.setResponsibleUser(loggedInUser);
+//                    return filesRepository.save(file);
+//                })
+//                .orElseThrow(() -> new ResourceNotFoundException("File not found with id " + id));
+//    }
 
     public List<Files> updateMultipleFiles(List<Files> files) {
         User loggedInUser = getLoggedInUser();
@@ -100,14 +119,14 @@ public class FilesService {
         filesRepository.deleteAllById(ids);
     }
 
-    public Files assignFileToCaseStudy(Long fileId, Long caseStudyId) {
+    public Files assignFileToFileCategory(Long fileId, Long fileCategoryId) {
         Files file = filesRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
 
-        CaseStudy caseStudy = caseStudyRepository.findById(caseStudyId)
+        FileCategory fileCategory = fileCategoryRepository.findById(fileCategoryId)
                 .orElseThrow(() -> new RuntimeException("Case study not found"));
 
-        file.setCaseStudy(caseStudy);
+        file.setFileCategory(fileCategory);
         return filesRepository.save(file);
     }
 
@@ -122,65 +141,105 @@ public class FilesService {
         return filesRepository.save(file);
     }
 
-
-    public String checkFileIn(Long fileId) throws AccessDeniedException {
-        // Fetch the file by its ID
+    @Transactional
+    public String checkFileOut(Long fileId) throws AccessDeniedException {
         Files file = filesRepository.findById(fileId)
                 .orElseThrow(() -> new ResourceNotFoundException("File not found."));
 
-        // Fetch the current logged-in user
+        if (file.getStatus().equals("Unavailable")) {
+            throw new IllegalStateException("File is already checked out.");
+        }
+
         User currentUser = getLoggedInUser();
 
-        // Find all requests for this file
-        List<Requests> requests = requestsRepository.findByFilesAndUser(file, file.getResponsibleUser());
+        // ✅ Check if the user is a SUPER_ADMIN
+        boolean isSuperAdmin = currentUser.getRoles().stream()
+                .anyMatch(role -> "SUPER_ADMIN".equals(role.getName()));
 
-        // Find active checkout requests (not returned)
-        List<Requests> activeRequests = requests.stream()
-                .filter(r -> Objects.equals(r.getFiles().getId(), fileId) &&
-                        !Objects.equals(r.getStage(), "Returned") &&
-                        Objects.equals(r.getStage(), "Approved"))
-                .toList();
-
-        // Check if file is actually checked out
-        if (activeRequests.isEmpty()) {
-            throw new IllegalStateException("This file has not been checked out.");
+        // ✅ Regular users can only check out files belonging to their organization
+        if (!isSuperAdmin) {
+            if (file.getOrganization() == null || !file.getOrganization().getId().equals(currentUser.getOrganization().getId())) {
+                throw new AccessDeniedException("You can only check out files within your organization.");
+            }
         }
 
-        // Verify the current user is the one who checked it out
-        boolean isCheckedOutByCurrentUser = activeRequests.stream()
-                .anyMatch(r -> r.getUser().equals(currentUser));
+        // ✅ Store who checked out the file
+        file.setCheckedOutBy(currentUser.getId());
+        file.setStatus("Unavailable"); // Change status
+        filesRepository.save(file);
 
-        if (!isCheckedOutByCurrentUser) {
-            throw new AccessDeniedException("Only the user who checked out the file can check it in.");
+        return "File checked out successfully by user ID: " + currentUser.getId();
+    }
+
+
+    @Transactional
+    public String checkFileIn(Long fileId) throws AccessDeniedException {
+        Files file = filesRepository.findById(fileId)
+                .orElseThrow(() -> new ResourceNotFoundException("File not found."));
+
+        User currentUser = getLoggedInUser();
+
+        boolean isSuperAdmin = currentUser.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("SUPER_ADMIN"));
+
+        if (!isSuperAdmin && !Objects.equals(file.getCheckedOutBy(), currentUser.getId())) {
+            throw new AccessDeniedException("Only the user who checked out the file or an admin can check it in.");
         }
 
-        // Update all active requests to Returned status
-        activeRequests.forEach(request -> {
-            request.setStage("Returned");
-            requestsRepository.save(request);
-        });
-
-        // Update file status
-        file.setStatus("Available");
+        file.setStatus("Available"); // ✅ Change status to Available
+        file.setCheckedOutBy(null);  // ✅ Clear checkedOutBy field
         filesRepository.save(file);
 
         return "File checked in successfully.";
     }
 
-    public List<Files> getFilesByDepartments(Long userId) {
-        // Fetch user's department IDs
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if (user.getDepartments() == null || user.getDepartments().isEmpty()) {
-            return List.of(); // Return empty if no departments assigned
+    public Files addFile(FileRequest request) {
+        StorageLocation archivalBox = storageLocationRepository.findById(request.getArchivalBoxId())
+                .orElseThrow(() -> new ResourceNotFoundException("Archival Box not found"));
+
+        Folders folder = foldersRepository.findById(request.getFolderId())
+                .orElseThrow(() -> new ResourceNotFoundException("Folder not found"));
+
+        Files file = Files.builder()
+                .boxNumber(request.getBoxNumber())
+                .archivalBox(archivalBox)
+                .folder(folder)
+                .status("Available")
+                .build();
+
+        return filesRepository.save(file);
+    }
+    public List<Files> bulkUpload(BulkFileUploadRequest bulkRequest) {
+        StorageLocation archivalBox = storageLocationRepository.findById(bulkRequest.getArchivalBoxId())
+                .orElseThrow(() -> new ResourceNotFoundException("Archival Box not found"));
+
+        Organization organization = organizationRepository.findById(bulkRequest.getOrganizationId())
+                .orElseThrow(() -> new ResourceNotFoundException("Organization not found"));
+
+        List<Files> newFiles = new ArrayList<>();
+
+        if (bulkRequest.getMetadataJson() != null && !bulkRequest.getMetadataJson().isEmpty()) {
+            for (Map<String, Object> fileMetadata : bulkRequest.getMetadataJson()) {
+                Files file = Files.builder()
+                        .boxNumber(bulkRequest.getBoxNumber())
+                        .archivalBox(archivalBox)
+                        .organization(organization)
+                        .status("Available") // ✅ Ensure files are created as Available
+                        .build();
+
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    file.setMetadataJson(mapper.writeValueAsString(fileMetadata));
+                } catch (Exception e) {
+                    System.err.println("Error serializing metadata: " + e.getMessage());
+                }
+
+                newFiles.add(file);
+            }
         }
 
-        List<Long> departmentIds = user.getDepartments().stream()
-                .map(Department::getId)
-                .collect(Collectors.toList());
-
-        return filesRepository.findFilesByDepartmentIdsAndFolders(departmentIds);
+        return filesRepository.saveAll(newFiles);
     }
 
 }

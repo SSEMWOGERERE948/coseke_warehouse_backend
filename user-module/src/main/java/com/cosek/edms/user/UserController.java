@@ -29,17 +29,18 @@ public class UserController {
     public ResponseEntity<User> findUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findOneUser(id));
     }
-
     @PostMapping("/create-users")
-    public ResponseEntity<User> createUser(@RequestBody CreateUserRequest request) {
-        User response = null;
+    public ResponseEntity<?> createUser(@RequestBody CreateUserRequest request) {
         try {
-            response = userService.createUser(request);
+            User response = userService.createUser(request);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (NotFoundException e) {
-            throw new RuntimeException(e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User creation failed: " + e.getMessage());
         }
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
 
     @PutMapping("/{userID}/roles/{roleID}")
     public ResponseEntity<User> addRoleToUser(@PathVariable Long userID, @PathVariable Long roleID) throws NotFoundException {
@@ -53,12 +54,12 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PutMapping("/update/{id}")
+    @PostMapping("/update/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest update) {
         try {
             return ResponseEntity.ok(userService.updateUser(update, id));
         } catch (NotFoundException e) {
-            throw new RuntimeException(e);
+            return ResponseEntity.notFound().build();
         }
     }
 

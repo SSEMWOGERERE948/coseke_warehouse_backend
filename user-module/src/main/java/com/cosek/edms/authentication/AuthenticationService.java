@@ -1,8 +1,9 @@
 package com.cosek.edms.authentication;
 
 import com.cosek.edms.config.JwtService;
-import com.cosek.edms.departments.Department;
 import com.cosek.edms.exception.NotFoundException;
+import com.cosek.edms.organisation.Organization;
+import com.cosek.edms.organisation.OrganizationRepository;
 import com.cosek.edms.role.Role;
 import com.cosek.edms.role.RoleRepository;
 import com.cosek.edms.user.User;
@@ -24,14 +25,23 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private OrganizationRepository organizationRepository;
 
-    public AuthenticationResponse register(RegisterRequest request, Long roleID) {
+    public AuthenticationResponse register(RegisterRequest request, Long roleID, Long organizationId) {
 
         Optional<Role> role = roleRepository.findById(roleID);
         HashSet<Role> roles = new HashSet<>();
         assert role.isPresent();
 
         roles.add(role.get());
+
+        Organization organization = null;
+        try {
+            organization = organizationRepository.findById(organizationId)
+                    .orElseThrow(() -> new NotFoundException("Organization not found"));
+        } catch (NotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
         var user = User.builder()
                 .email(request.getEmail())
@@ -41,6 +51,7 @@ public class AuthenticationService {
                 .address(request.getAddress())
                 .phone(request.getPhone())
                 .roles(roles)
+                .organization(organization)
                 .build();
         userRepository.save(user);
         return generateToken(user, roles);
@@ -61,13 +72,6 @@ public class AuthenticationService {
     private AuthenticationResponse generateToken(User user, Set<Role> roles) {
         var jwtToken = jwtService.generateToken(user);
 
-        // Ensure departments are not null or empty
-        List<Long> departmentIds = user.getDepartments() != null
-                ? user.getDepartments().stream()
-                .map(Department::getId)
-                .collect(Collectors.toList())
-                : Collections.emptyList();
-
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .id(user.getId())
@@ -75,7 +79,7 @@ public class AuthenticationService {
                 .last_name(user.getLast_name())
                 .email(user.getEmail())
                 .roles(roles)
-                .departmentIds(departmentIds)
+                .organizationId(user.getOrganization() != null ? user.getOrganization().getId() : null)
                 .build();
     }
 

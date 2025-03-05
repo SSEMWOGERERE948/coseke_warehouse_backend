@@ -19,11 +19,11 @@ public class RequestsController {
     private final RequestsService requestsService;
 
     // Create a new request
-    @PostMapping
-    public ResponseEntity<Requests> createRequest(@RequestBody Requests requests) {
-        Requests createdRequest = requestsService.createRequest(requests);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
-    }
+//    @PostMapping
+//    public ResponseEntity<Requests> createRequest(@RequestBody Requests requests) {
+//        Requests createdRequest = requestsService.createRequest(requests);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
+//    }
 
     // Change the stage of a request
     @PutMapping("/{requestId}/stage")
@@ -65,13 +65,13 @@ public class RequestsController {
         }
     }
     // Reject a request
-    @PutMapping("/{requestId}/reject")
-    public ResponseEntity<Requests> rejectRequest(@PathVariable Long requestId, @RequestParam String reason) {
-        Optional<Requests> approvedRequest = requestsService.rejectRequest(requestId, reason);
-        approvedRequest.get().setStage("Rejected");
-        return approvedRequest.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
+//    @PutMapping("/{requestId}/reject")
+//    public ResponseEntity<Requests> rejectRequest(@PathVariable Long requestId, @RequestParam String reason) {
+//        Optional<Requests> approvedRequest = requestsService.rejectRequest(requestId, reason);
+//        approvedRequest.get().setStage("Rejected");
+//        return approvedRequest.map(ResponseEntity::ok)
+//                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+//    }
 
     // Get a request by ID
     @GetMapping("/{requestId}")
