@@ -5,6 +5,9 @@ import com.cosek.edms.exception.ResourceNotFoundException;
 import com.cosek.edms.files.Models.BulkFileUploadRequest;
 import com.cosek.edms.files.Models.FileRequest;
 import com.cosek.edms.folders.FoldersService;
+import com.cosek.edms.requests.Requests;
+import com.cosek.edms.requests.RequestsRepository;
+import com.cosek.edms.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +33,8 @@ public class FilesController {
     @Autowired
     private final FoldersService foldersService;
 
+    @Autowired
+    private final RequestsRepository requestsRepository;
 
 
     @GetMapping("/{id}")
@@ -113,6 +118,32 @@ public class FilesController {
         } catch (AccessDeniedException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
+    }
+
+
+    @GetMapping("/requests")
+    public ResponseEntity<List<Requests>> getRequests(
+            @RequestParam(required = false) boolean isAdmin,
+            @RequestParam(required = false) Long organizationId,
+            @RequestParam(required = false) Integer boxNumber
+    ) {
+        User currentUser = filesService.getLoggedInUser(); // ✅ Get the logged-in user
+
+        List<Requests> requests;
+
+        if (isAdmin) {
+            if (organizationId != null) {
+                requests = requestsRepository.findByOrganizationId(organizationId); // ✅ Filter by Organization
+            } else if (boxNumber != null) {
+                requests = requestsRepository.findByBoxNumber(boxNumber); // ✅ Filter by Box Number
+            } else {
+                requests = requestsRepository.findAll(); // ✅ Admin sees all requests
+            }
+        } else {
+            requests = requestsRepository.findByUserId(currentUser.getId()); // ✅ Users see their own requests
+        }
+
+        return ResponseEntity.ok(requests);
     }
 
 

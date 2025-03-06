@@ -80,7 +80,6 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/case-studies/delete/{id}").hasAuthority(DELETE_FILECATEGORY)
 
                                 // Files permissions
-                                .requestMatchers(HttpMethod.GET, "/api/v1/files/{id}").hasAuthority(READ_FILES)
                                 .requestMatchers(HttpMethod.GET, "/api/v1/files/all").hasAuthority(READ_FILES)
                                 .requestMatchers(HttpMethod.GET, "/api/v1/files/all/{id}").hasAuthority(READ_FILES)
                                 .requestMatchers(HttpMethod.POST, "/api/v1/files/add").hasAuthority(CREATE_FILES)
@@ -88,6 +87,12 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.PUT, "/api/v1/files/update-multiple").hasAuthority(UPDATE_FILES)
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/files/delete/{id}").hasAuthority(DELETE_FILES)
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/files/delete-multiple").hasAuthority(DELETE_FILES)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/files/{id}").hasAuthority(READ_FILES)
+                                .requestMatchers(HttpMethod.POST, "/api/v1/files/{fileId}/check-in").hasAuthority(CREATE_FILES)
+                                .requestMatchers(HttpMethod.POST, "/api/v1/files/{fileId}/check-out").hasAuthority(CREATE_FILES)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/files/requests").hasAuthority(READ_REQUESTS)
+
+
 
 
                                 // Folders permissions

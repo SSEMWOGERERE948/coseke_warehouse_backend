@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,7 +41,7 @@ public class FilesService {
 
     private final FilesRepository filesRepository;
 
-    private User getLoggedInUser() {
+    public User getLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         return userRepository.findByEmail(username).orElseThrow(() ->
@@ -151,22 +152,34 @@ public class FilesService {
         }
 
         User currentUser = getLoggedInUser();
-
-        // ✅ Check if the user is a SUPER_ADMIN
         boolean isSuperAdmin = currentUser.getRoles().stream()
                 .anyMatch(role -> "SUPER_ADMIN".equals(role.getName()));
 
-        // ✅ Regular users can only check out files belonging to their organization
         if (!isSuperAdmin) {
-            if (file.getOrganization() == null || !file.getOrganization().getId().equals(currentUser.getOrganization().getId())) {
+            if (file.getOrganization() == null ||
+                    !file.getOrganization().getId().equals(currentUser.getOrganization().getId())) {
                 throw new AccessDeniedException("You can only check out files within your organization.");
             }
         }
 
         // ✅ Store who checked out the file
         file.setCheckedOutBy(currentUser.getId());
-        file.setStatus("Unavailable"); // Change status
+        file.setStatus("Unavailable");
         filesRepository.save(file);
+
+        // ✅ Create a request entry with organization and box number
+        Requests request = Requests.builder()
+                .file(file)
+                .user(currentUser)
+                .requestType("Check Out")
+                .status("Completed")
+                .requestDate(LocalDateTime.now())
+                .completedDate(LocalDateTime.now())
+                .boxNumber(file.getBoxNumber()) // ✅ Store box number
+                .organization(file.getOrganization()) // ✅ Store organization
+                .build();
+
+        requestsRepository.save(request);
 
         return "File checked out successfully by user ID: " + currentUser.getId();
     }
@@ -178,20 +191,41 @@ public class FilesService {
                 .orElseThrow(() -> new ResourceNotFoundException("File not found."));
 
         User currentUser = getLoggedInUser();
-
         boolean isSuperAdmin = currentUser.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase("SUPER_ADMIN"));
 
-        if (!isSuperAdmin && !Objects.equals(file.getCheckedOutBy(), currentUser.getId())) {
-            throw new AccessDeniedException("Only the user who checked out the file or an admin can check it in.");
+        if (!isSuperAdmin) {
+            if (!Objects.equals(file.getCheckedOutBy(), currentUser.getId())) {
+                throw new AccessDeniedException("Only the user who checked out the file or an admin can check it in.");
+            }
+
+            if (file.getOrganization() == null ||
+                    !file.getOrganization().getId().equals(currentUser.getOrganization().getId())) {
+                throw new AccessDeniedException("You can only check in files within your organization.");
+            }
         }
 
-        file.setStatus("Available"); // ✅ Change status to Available
-        file.setCheckedOutBy(null);  // ✅ Clear checkedOutBy field
+        file.setStatus("Available");
+        file.setCheckedOutBy(null);
         filesRepository.save(file);
+
+        // ✅ Create a request entry for check-in
+        Requests request = Requests.builder()
+                .file(file)
+                .user(currentUser)
+                .requestType("Check In")
+                .status("Completed")
+                .requestDate(LocalDateTime.now())
+                .completedDate(LocalDateTime.now())
+                .boxNumber(file.getBoxNumber()) // ✅ Store box number
+                .organization(file.getOrganization()) // ✅ Store organization
+                .build();
+
+        requestsRepository.save(request);
 
         return "File checked in successfully.";
     }
+
 
 
     public Files addFile(FileRequest request) {
@@ -241,5 +275,7 @@ public class FilesService {
 
         return filesRepository.saveAll(newFiles);
     }
+
+
 
 }

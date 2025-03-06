@@ -1,59 +1,53 @@
 package com.cosek.edms.requests;
 
 import com.cosek.edms.files.Files;
+import com.cosek.edms.organisation.Organization;
 import com.cosek.edms.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
+import lombok.*;
 import java.time.LocalDateTime;
 
-@Data
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
-@Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
+@Builder
+@Table(name = "requests")
 public class Requests {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String stage;
-    private String state;
-    private LocalDateTime returnDate;
-    private String reason;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "file_id", nullable = false)
+    @JsonBackReference("file-requests") // Prevents infinite loop
+    private Files file;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "files_id", referencedColumnName = "id", nullable = false)
-    private Files files;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference("user-requests") // Prevents infinite loop
     private User user;
 
-    @CreatedDate
-    @Column(name = "createdDate", nullable = false, updatable = false)
-    private LocalDateTime createdDate;
+    @Column(nullable = false)
+    private String requestType; // "Check Out" or "Check In"
 
-    @LastModifiedDate
-    @Column(name="lastModifiedDate", nullable = true)
-    private LocalDateTime lastModifiedDateTime;
+    @Column(nullable = false)
+    private String status; // "Pending", "Approved", "Completed"
 
-    @LastModifiedBy
-    @Column(name = "lastModifiedBy", nullable = true)
-    private Long lastModifiedBy;
+    @Column(nullable = false)
+    private LocalDateTime requestDate; // Stores when the request was made
 
-    @CreatedBy
-    @Column(name="createdBy", nullable = true, updatable = true)
-    private Long createdBy;
+    @Column(nullable = true)
+    private LocalDateTime completedDate; // Stores when the request was completed
 
+    @Column(nullable = false)
+    private int boxNumber; // ✅ Added Box Number
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organization_id", nullable = false)
+    private Organization organization; // ✅ Added Organization Reference
 }
