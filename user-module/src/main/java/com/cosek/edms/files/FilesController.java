@@ -94,6 +94,12 @@ public class FilesController {
 
     @PostMapping("/{fileId}/check-in")
     public ResponseEntity<String> checkFileIn(@PathVariable Long fileId) {
+        User currentUser = filesService.getLoggedInUser();
+
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated.");
+        }
+
         try {
             String message = filesService.checkFileIn(fileId);
             return ResponseEntity.ok(message);
@@ -105,6 +111,7 @@ public class FilesController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
     }
+
 
     @PostMapping("/{fileId}/check-out")
     public ResponseEntity<String> checkFileOut(@PathVariable Long fileId) {
@@ -146,6 +153,20 @@ public class FilesController {
         return ResponseEntity.ok(requests);
     }
 
+
+    @PostMapping("/{requestId}/approve")
+    public ResponseEntity<String> approveRequest(@PathVariable Long requestId) {
+        try {
+            String message = filesService.approveRequest(requestId);
+            return ResponseEntity.ok(message);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
+    }
 
     @GetMapping("all/{id}")
     public ResponseEntity<List<Files>> getAllFilesById(@PathVariable Long id) {

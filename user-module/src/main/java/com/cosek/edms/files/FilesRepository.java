@@ -41,4 +41,5 @@ public interface FilesRepository extends JpaRepository<Files, Long> {
     WHERE sl1.type = 'Archival Box'
     """, nativeQuery = true)
     List<Object[]> findAllArchivalBoxesWithHierarchy();
+    
 }

@@ -90,6 +90,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.GET, "/api/v1/files/{id}").hasAuthority(READ_FILES)
                                 .requestMatchers(HttpMethod.POST, "/api/v1/files/{fileId}/check-in").hasAuthority(CREATE_FILES)
                                 .requestMatchers(HttpMethod.POST, "/api/v1/files/{fileId}/check-out").hasAuthority(CREATE_FILES)
+                                .requestMatchers(HttpMethod.POST, "/api/v1/files/{requestId}/approve").hasAuthority(UPDATE_REQUESTS)
                                 .requestMatchers(HttpMethod.GET, "/api/v1/files/requests").hasAuthority(READ_REQUESTS)
 
 
