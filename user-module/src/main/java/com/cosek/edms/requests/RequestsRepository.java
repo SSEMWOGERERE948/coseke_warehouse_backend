@@ -28,5 +28,4 @@ public interface RequestsRepository extends JpaRepository<Requests, Long> {
     // ✅ Fetch all requests for admin
     List<Requests> findAll();
 
-
 }

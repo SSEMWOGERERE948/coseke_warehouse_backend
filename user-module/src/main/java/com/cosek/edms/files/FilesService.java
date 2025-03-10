@@ -173,9 +173,10 @@ public class FilesService {
         file.setCheckedOutBy(currentUser.getId());
         filesRepository.save(file);
 
-        // ✅ Create a "Pending" request
+        // ✅ Create a "Pending" request with `fileId` included
         Requests request = Requests.builder()
                 .file(file)
+                .fileId(file.getId()) // ✅ Explicitly set fileId
                 .user(currentUser)
                 .requestType("Check Out")
                 .status("Pending") // ✅ Pending until admin approves
@@ -217,38 +218,41 @@ public class FilesService {
 
 
     @Transactional
-    public String checkFileIn(Long fileId) throws AccessDeniedException {
-        Files file = filesRepository.findById(fileId)
-                .orElseThrow(() -> new ResourceNotFoundException("File not found."));
+    public String checkFileIn(Long requestId) throws AccessDeniedException {
+        // ✅ Fetch the request by requestId (not fileId)
+        Requests request = requestsRepository.findById(requestId)
+                .orElseThrow(() -> new ResourceNotFoundException("Request not found."));
 
-        if (!"Unavailable".equals(file.getStatus())) {
-            throw new IllegalStateException("Only unavailable files can be checked in.");
+        // ✅ Ensure request is "Approved"
+        if (!"Approved".equalsIgnoreCase(request.getStatus())) {
+            throw new IllegalStateException("Only approved files can be checked in.");
         }
+
+        // ✅ Fetch the correct file using request.getFileId()
+        Files file = filesRepository.findById(request.getFile().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("File not found."));
 
         User currentUser = getLoggedInUser();
         boolean isSuperAdmin = currentUser.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase("SUPER_ADMIN"));
 
-        if (!isSuperAdmin) {
-            if (!Objects.equals(file.getCheckedOutBy(), currentUser.getId())) {
-                throw new AccessDeniedException("Only the user who checked out the file or an admin can check it in.");
-            }
+        // ✅ Ensure only the user who checked out the file or an admin can check it in
+        if (!isSuperAdmin && !Objects.equals(file.getCheckedOutBy(), currentUser.getId())) {
+            throw new AccessDeniedException("Only the user who checked out the file or an admin can check it in.");
         }
 
+        // ✅ Change file status back to "Available"
         file.setStatus("Available");
         file.setCheckedOutBy(null);
         filesRepository.save(file);
 
-        // ✅ Mark the request as completed
-        Requests request = requestsRepository.findByFileIdAndStatus(file.getId(), "Approved")
-                .orElseThrow(() -> new ResourceNotFoundException("No active request found."));
-
+        // ✅ Mark request as "Completed"
         request.setStatus("Completed");
+        request.setCompletedDate(LocalDateTime.now());
         requestsRepository.save(request);
 
         return "File checked in successfully.";
     }
-
 
 
 

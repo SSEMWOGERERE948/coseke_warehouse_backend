@@ -47,6 +47,9 @@ public class Requests {
     @Column(nullable = false)
     private int boxNumber; // ✅ Added Box Number
 
+    @Column(name = "file_id", insertable = false, updatable = false)
+    private Long fileId; // ✅ Store file ID separately
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organization_id", nullable = false)
     private Organization organization; // ✅ Added Organization Reference
