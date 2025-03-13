@@ -204,7 +204,7 @@ public class FilesService {
         }
     }
     private void sendCheckOutNotification(Files file, User currentUser) {
-        String recipientEmail = "strevor948@gmail.com"; // New recipient email
+        String recipientEmail = "anita.ninsiima@coseke.com"; // New recipient email
         String subject = "File Checkout Request - Pending Approval";
         String messageBody = String.format(
                 "Dear Admin,\n\nUser %s (Email: %s) has requested to check out a file.\n\nFile Details:\n" +
