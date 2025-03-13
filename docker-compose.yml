@@ -1,15 +1,13 @@
 version: "3.8"
+
 services:
   warehouse-backend:
     image: trevorsimon/coseke_warehouse_backend:latest
     container_name: coseke_warehouse_backend
     ports:
-      - "8080:8080"
+      - "8080:8080"  # Exposing backend on port 8080
     networks:
       - warehouse-network
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:sqlserver://host.docker.internal:1433;databaseName=warehouse
-      # Add other required environment variables for authentication, etc.
 
 networks:
   warehouse-network:
